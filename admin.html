@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración - Registros</title>
+
+  <!-- Librería ligera y confiable para Canvas QR -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #10b981;
+      --success-hover: #059669;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
+    .btn-salir {
+      background-color: #f1f5f9;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-salir:hover {
+      background-color: #e2e8f0;
+    }
+
+    /* Pestañas (Tabs) */
+    .tabs-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 2px;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      border: none;
+      background: none;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 850px) {
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    input {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background-color: #f8fafc;
+      outline: none;
+    }
+
+    input:focus {
+      background-color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .btn {
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .btn-primary { background-color: var(--primary); color: white; }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+
+    .btn-success { background-color: var(--success); color: white; }
+    .btn-success:hover { background-color: var(--success-hover); }
+
+    /* Panel Generador QR */
+    .qr-preview-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .qr-box {
+      width: 180px;
+      height: 180px;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      background: #fafafa;
+    }
+
+    .qrCanvas {
+      width: 160px;
+      height: 160px;
+      border-radius: 6px;
+    }
+
+    .qr-placeholder {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding: 10px;
+    }
+
+    /* Tabla */
+    .table-container { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 12px 16px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .num-orden {
+      font-weight: 700;
+      color: var(--primary);
+      text-align: center;
+    }
+
+    .btn-orden-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .btn-orden {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .qr-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .qr-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .actions { display: flex; gap: 8px; }
+
+    .btn-sm {
+      padding: 7px 12px;
+      font-size: 0.82rem;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+
+    .btn-danger { background-color: var(--danger); color: white; }
+    .btn-danger:hover { background-color: var(--danger-hover); }
+
+    .hidden { display: none !important; }
+
+    /* Modal Emergente */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      padding: 28px;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      transform: scale(0.9);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-card img {
+      width: 240px;
+      height: 240px;
+      border-radius: 8px;
+      margin: 16px 0;
+      border: 1px solid var(--border);
+    }
+
+    .modal-info {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Panel de Administración</h1>
+      <button class="btn-salir" onclick="window.location.href='index.html'">Volver</button>
+    </header>
+
+    <!-- Pestañas de Navegación -->
+    <div class="tabs-container">
+      <button class="tab-btn active" onclick="cambiarPestana('comite')">Registro Comité</button>
+      <button class="tab-btn" onclick="cambiarPestana('colega')">Registro Colegas</button>
+    </div>
+
+    <!-- PESTAÑA 1: COMITÉ -->
+    <div id="tab-comite" class="tab-content active">
+      <div class="admin-grid">
+        <div class="card">
+          <div class="card-title">1. Datos del Miembro del Comité</div>
+          <form id="comiteForm" onsubmit="generarQRComite(event)">
+            <div class="form-grid">
+              <div class="input-group">
+                <label for="c_nombre">Nombre Completo</label>
+                <input type="text" id="c_nombre" placeholder="Ej. Ana María Gómez" required>
+              </div>
+              <div class="input-group">
+                <label for="c_puesto">Puesto</label>
+                <input type="text" id="c_puesto" placeholder="Ej. Presidenta" required>
+              </div>
+              <div class="input-group">
+                <label for="c_numero">Número (en letras)</label>
+                <input type="text" id="c_numero" placeholder="Ej. Cuarenta y dos" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Generar Código QR</button>
+          </form>
+        </div>
+
+        <div class="card qr-preview-card">
+          <div class="card-title">2. Código QR Generado</div>
+          <div class="qr-box">
+            <span id="c_placeholder" class="qr-placeholder">Ingresa datos y presiona Generar QR</span>
+            <canvas id="c_qrCanvas" class="qrCanvas hidden"></canvas>
+          </div>
+          <button id="c_btnGuardar" class="btn btn-success hidden" onclick="guardarComite()">
+            Guardar en Tabla
+          </button>
+        </div>
+      </div>
+
+      <div class="card table-container">
+        <div class="card-title">Registros del Comité</div>
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align: center;">#</th>
+              <th>Orden</th>
+              <th>QR (Clic para ampliar)</th>
+              <th>Nombre</th>
+              <th>Puesto</th>
+              <th>Número</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaComite"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 2: COLEGA / VEHÍCULO -->
+    <div id="tab-colega" class="tab-content">
+      <div class="admin-grid">
+        <div class="card">
+          <div class="card-title">1. Datos del Colega y Vehículo</div>
+          <form id="colegaForm" onsubmit="generarQRColega(event)">
+            <div class="form-grid">
+              <div class="input-group">
+                <label for="v_numColega">Número de Colega</label>
+                <input type="text" id="v_numColega" placeholder="Ej. COL-042" required>
+              </div>
+              <div class="input-group">
+                <label for="v_nombre">Nombre</label>
+                <input type="text" id="v_nombre" placeholder="Ej. Carlos Mendoza" required>
+              </div>
+              <div class="input-group">
+                <label for="v_modelo">Modelo</label>
+                <input type="text" id="v_modelo" placeholder="Ej. Toyota Corolla 2022" required>
+              </div>
+              <div class="input-group">
+                <label for="v_color">Color</label>
+                <input type="text" id="v_color" placeholder="Ej. Rojo Metálico" required>
+              </div>
+              <div class="input-group">
+                <label for="v_placas">Placas</label>
+                <input type="text" id="v_placas" placeholder="Ej. ABC-123-X" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Generar Código QR</button>
+          </form>
+        </div>
+
+        <div class="card qr-preview-card">
+          <div class="card-title">2. Código QR Generado</div>
+          <div class="qr-box">
+            <span id="v_placeholder" class="qr-placeholder">Ingresa datos y presiona Generar QR</span>
+            <canvas id="v_qrCanvas" class="qrCanvas hidden"></canvas>
+          </div>
+          <button id="v_btnGuardar" class="btn btn-success hidden" onclick="guardarColega()">
+            Guardar en Tabla
+          </button>
+        </div>
+      </div>
+
+      <div class="card table-container">
+        <div class="card-title">Registros de Colegas y Vehículos</div>
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align: center;">#</th>
+              <th>Orden</th>
+              <th>QR (Clic para ampliar)</th>
+              <th>N° Colega</th>
+              <th>Nombre</th>
+              <th>Modelo</th>
+              <th>Color</th>
+              <th>Placas</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaColega"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal para ver el QR ampliado -->
+  <div class="modal-overlay" id="modalQr" onclick="cerrarModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <h3 id="modalTitulo">Título</h3>
+      <img id="modalImgQR" src="" alt="Código QR Grande">
+      <div class="modal-info" id="modalInfo">Detalles</div>
+      <button class="btn btn-primary" onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    let miembrosComite = JSON.parse(localStorage.getItem('comite_miembros')) || [];
+    let miembrosColegas = JSON.parse(localStorage.getItem('colega_miembros')) || [];
+
+    let tempComite = null;
+    let tempColega = null;
+
+    let qrComite = null;
+    let qrColega = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      qrComite = new QRious({ element: document.getElementById('c_qrCanvas'), size: 200, level: 'H' });
+      qrColega = new QRious({ element: document.getElementById('v_qrCanvas'), size: 200, level: 'H' });
+
+      renderizarTablaComite();
+      renderizarTablaColega();
+    });
+
+    // Control de Pestañas
+    function cambiarPestana(pestana) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      if (pestana === 'comite') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tab-comite').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tab-colega').classList.add('active');
+      }
+    }
+
+    // --- LÓGICA COMITÉ ---
+    function generarQRComite(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('c_nombre').value.trim();
+      const puesto = document.getElementById('c_puesto').value.trim();
+      const numero = document.getElementById('c_numero').value.trim();
+
+      qrComite.value = `Tipo: Comité\nNombre: ${nombre}\nPuesto: ${puesto}\nNúmero: ${numero}`;
+      tempComite = { nombre, puesto, numero };
+
+      document.getElementById('c_placeholder').classList.add('hidden');
+      document.getElementById('c_qrCanvas').classList.remove('hidden');
+      document.getElementById('c_btnGuardar').classList.remove('hidden');
+    }
+
+    function guardarComite() {
+      if (!tempComite) return;
+      const qrImagenBase64 = document.getElementById('c_qrCanvas').toDataURL("image/png");
+
+      miembrosComite.push({ id: Date.now(), ...tempComite, qrImagen: qrImagenBase64 });
+      localStorage.setItem('comite_miembros', JSON.stringify(miembrosComite));
+      renderizarTablaComite();
+
+      document.getElementById('comiteForm').reset();
+      document.getElementById('c_qrCanvas').classList.add('hidden');
+      document.getElementById('c_placeholder').classList.remove('hidden');
+      document.getElementById('c_btnGuardar').classList.add('hidden');
+      tempComite = null;
+    }
+
+    function renderizarTablaComite() {
+      const tbody = document.getElementById('tablaComite');
+      tbody.innerHTML = '';
+
+      if (miembrosComite.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 25px;">Sin registros.</td></tr>`;
+        return;
+      }
+
+      miembrosComite.forEach((m, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="num-orden">${index + 1}</td>
+          <td>
+            <div class="btn-orden-container">
+              <button class="btn-orden" onclick="moverOrden('comite', ${index}, -1)">▲</button>
+              <button class="btn-orden" onclick="moverOrden('comite', ${index}, 1)">▼</button>
+            </div>
+          </td>
+          <td>
+            <img src="${m.qrImagen}" class="qr-thumb" onclick="abrirModal('${m.nombre}', '${m.puesto} | N°: ${m.numero}', '${m.qrImagen}')">
+          </td>
+          <td><strong>${m.nombre}</strong></td>
+          <td>${m.puesto}</td>
+          <td>${m.numero}</td>
+          <td class="actions">
+            <a href="${m.qrImagen}" download="QR_${m.nombre}.png" class="btn btn-sm btn-success">Descargar</a>
+            <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('comite', ${m.id})">Borrar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- LÓGICA COLEGA / VEHÍCULO ---
+    function generarQRColega(e) {
+      e.preventDefault();
+      const numColega = document.getElementById('v_numColega').value.trim();
+      const nombre = document.getElementById('v_nombre').value.trim();
+      const modelo = document.getElementById('v_modelo').value.trim();
+      const color = document.getElementById('v_color').value.trim();
+      const placas = document.getElementById('v_placas').value.trim();
+
+      qrColega.value = `Tipo: Colega\nN° Colega: ${numColega}\nNombre: ${nombre}\nModelo: ${modelo}\nColor: ${color}\nPlacas: ${placas}`;
+      tempColega = { numColega, nombre, modelo, color, placas };
+
+      document.getElementById('v_placeholder').classList.add('hidden');
+      document.getElementById('v_qrCanvas').classList.remove('hidden');
+      document.getElementById('v_btnGuardar').classList.remove('hidden');
+    }
+
+    function guardarColega() {
+      if (!tempColega) return;
+      const qrImagenBase64 = document.getElementById('v_qrCanvas').toDataURL("image/png");
+
+      miembrosColegas.push({ id: Date.now(), ...tempColega, qrImagen: qrImagenBase64 });
+      localStorage.setItem('colega_miembros', JSON.stringify(miembrosColegas));
+      renderizarTablaColega();
+
+      document.getElementById('colegaForm').reset();
+      document.getElementById('v_qrCanvas').classList.add('hidden');
+      document.getElementById('v_placeholder').classList.remove('hidden');
+      document.getElementById('v_btnGuardar').classList.add('hidden');
+      tempColega = null;
+    }
+
+    function renderizarTablaColega() {
+      const tbody = document.getElementById('tablaColega');
+      tbody.innerHTML = '';
+
+      if (miembrosColegas.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color: var(--text-muted); padding: 25px;">Sin registros.</td></tr>`;
+        return;
+      }
+
+      miembrosColegas.forEach((m, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="num-orden">${index + 1}</td>
+          <td>
+            <div class="btn-orden-container">
+              <button class="btn-orden" onclick="moverOrden('colega', ${index}, -1)">▲</button>
+              <button class="btn-orden" onclick="moverOrden('colega', ${index}, 1)">▼</button>
+            </div>
+          </td>
+          <td>
+            <img src="${m.qrImagen}" class="qr-thumb" onclick="abrirModal('${m.nombre} (${m.numColega})', '${m.modelo} - ${m.color} | Placas: ${m.placas}', '${m.qrImagen}')">
+          </td>
+          <td><strong>${m.numColega}</strong></td>
+          <td>${m.nombre}</td>
+          <td>${m.modelo}</td>
+          <td>${m.color}</td>
+          <td><strong>${m.placas}</strong></td>
+          <td class="actions">
+            <a href="${m.qrImagen}" download="QR_Colega_${m.numColega}.png" class="btn btn-sm btn-success">Descargar</a>
+            <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('colega', ${m.id})">Borrar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- FUNCIONES COMPARTIDAS ---
+    function moverOrden(tipo, index, direccion) {
+      const lista = tipo === 'comite' ? miembrosComite : miembrosColegas;
+      const nuevoIndex = index + direccion;
+
+      if (nuevoIndex < 0 || nuevoIndex >= lista.length) return;
+
+      const temp = lista[index];
+      lista[index] = lista[nuevoIndex];
+      lista[nuevoIndex] = temp;
+
+      localStorage.setItem(tipo === 'comite' ? 'comite_miembros' : 'colega_miembros', JSON.stringify(lista));
+      tipo === 'comite' ? renderizarTablaComite() : renderizarTablaColega();
+    }
+
+    function eliminarRegistro(tipo, id) {
+      if (tipo === 'comite') {
+        miembrosComite = miembrosComite.filter(m => m.id !== id);
+        localStorage.setItem('comite_miembros', JSON.stringify(miembrosComite));
+        renderizarTablaComite();
+      } else {
+        miembrosColegas = miembrosColegas.filter(m => m.id !== id);
+        localStorage.setItem('colega_miembros', JSON.stringify(miembrosColegas));
+        renderizarTablaColega();
+      }
+    }
+
+    function abrirModal(titulo, info, imagenSrc) {
+      document.getElementById('modalTitulo').textContent = titulo;
+      document.getElementById('modalInfo').textContent = info;
+      document.getElementById('modalImgQR').src = imagenSrc;
+      document.getElementById('modalQr').classList.add('active');
+    }
+
+    function cerrarModal() {
+      document.getElementById('modalQr').classList.remove('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Dreams Sapphire </title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --primary-light: #2563eb;
+            --accent-color: #3b82f6;
+            --bg-color: #f8fafc; 
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding: 30px 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 1350px; }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1e3a8a 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-lg);
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        @media (min-width: 1024px) {
+            header { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+        header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+        header p { color: #93c5fd; font-size: 13.5px; margin-top: 4px; font-weight: 500; }
+
+        /* Modal e Info de Inicio de Turno */
+        .shift-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .shift-modal {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 460px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .shift-modal h2 {
+            font-size: 22px;
+            margin-bottom: 6px;
+            color: var(--primary-color);
+        }
+
+        .shift-modal p {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .shift-info-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex-wrap: wrap;
+        }
+
+        .btn-end-shift {
+            background: rgba(239, 68, 68, 0.25);
+            border: 1px solid #fca5a5;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            margin-left: auto;
+        }
+        .btn-end-shift:hover {
+            background: rgba(239, 68, 68, 0.5);
+        }
+
+        .btn-comite {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition-smooth);
+        }
+        .btn-comite:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Panel de Estadísticas / Contadores */
+        .stats-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 16px;
+            border-radius: 10px;
+            min-width: 130px;
+            text-align: center;
+            backdrop-filter: blur(4px);
+        }
+        .stat-card .stat-val {
+            font-size: 19px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .stat-card .stat-lbl {
+            font-size: 11px;
+            color: #93c5fd;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .upload-section {
+            background: #f0f7ff;
+            border: 2px dashed #93c5fd;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 25px;
+            transition: var(--transition-smooth);
+            animation: fadeIn 0.8s ease;
+            position: relative;
+        }
+        .upload-section:hover {
+            border-color: var(--primary-light);
+            background: #eff6ff;
+            transform: translateY(-1px);
+        }
+        .btn-upload {
+            border: none; color: white;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #1d4ed8 100%);
+            padding: 11px 22px; border-radius: 10px; font-size: 13.5px; font-weight: 600;
+            cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); transition: var(--transition-smooth);
+        }
+        .btn-upload:hover { transform: scale(1.02); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3); }
+        .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; margin-top: 10px; }
+        .upload-btn-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
+
+        .btn-reset-db {
+            background-color: transparent;
+            color: var(--danger-color);
+            border: 1px solid #fca5a5;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            margin-left: 10px;
+        }
+        .btn-reset-db:hover {
+            background-color: #fef2f2;
+            border-color: var(--danger-color);
+        }
+
+        .main-layout { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        @media (min-width: 1024px) { .main-layout { grid-template-columns: 7fr 5fr; } }
+
+        .card { 
+            background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); 
+            padding: 25px; box-shadow: var(--shadow-sm); transition: var(--transition-smooth);
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card:hover { box-shadow: var(--shadow-md); }
+        .card-title { font-size: 19px; font-weight: 700; margin-bottom: 20px; color: #0f172a; display: flex; align-items: center; justify-content: space-between; }
+
+        .controls-row { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+        @media (min-width: 768px) { .controls-row { flex-direction: row; align-items: center; justify-content: space-between; } }
+
+        .search-box { position: relative; flex-grow: 1; max-width: 380px; }
+        .search-box input { 
+            width: 100%; padding: 12px 15px 12px 42px; border: 1.5px solid var(--border-color); 
+            border-radius: 10px; font-size: 14px; outline: none; transition: var(--transition-smooth);
+        }
+        .search-box input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+        .search-box::before { content: "🔍"; position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text-light); }
+
+        .tabs { display: flex; flex-wrap: wrap; gap: 6px; background: #f1f5f9; padding: 5px; border-radius: 10px; }
+        .tab-btn { 
+            padding: 10px 14px; border: none; background: transparent; font-size: 13.5px; 
+            font-weight: 600; color: var(--text-light); cursor: pointer; border-radius: 8px; transition: var(--transition-smooth);
+        }
+        .tab-btn:hover { color: var(--text-color); }
+        .tab-btn.active { background: white; color: var(--primary-light); box-shadow: var(--shadow-sm); }
+        .tab-btn.btn-c1000-filter.active { color: #d97706; }
+
+        .register-tabs {
+            display: flex;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            gap: 2px;
+            overflow-x: auto;
+        }
+        .reg-tab {
+            flex: 1;
+            padding: 8px 6px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-light);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: var(--transition-smooth);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .reg-tab.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table-container { overflow-x: auto; max-height: 520px; border: 1px solid var(--border-color); border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th { background-color: #f8fafc; color: var(--text-color); font-weight: 600; padding: 14px 16px; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--border-color); }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); transition: var(--transition-smooth); }
+        
+        tr { cursor: pointer; transition: var(--transition-smooth); }
+        tr:hover { background-color: #f1f5f9; transform: translateY(-1px); }
+        tr.selected { background-color: #eff6ff !important; }
+        tr.selected td { border-bottom-color: #bfdbfe; color: #1e40af; }
+        
+        .checkbox-cell { width: 45px; text-align: center; }
+        .checkbox-cell input { width: 18px; height: 18px; accent-color: var(--primary-light); cursor: pointer; }
+        .col-num { width: 50px; text-align: center; color: var(--text-light); font-weight: 700; font-size: 13px; }
+
+        .btn-c1000 {
+            background-color: #fef3c7; color: #d97706; border: 1.5px solid #fde68a;
+            padding: 5px 10px; border-radius: 6px; font-weight: 700; font-size: 11px;
+            cursor: pointer; transition: var(--transition-smooth); display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-c1000:hover { background-color: #fde68a; transform: scale(1.05); }
+        .btn-c1000.liquidado {
+            background-color: #d1fae5; color: #065f46; border-color: #a7f3d0;
+        }
+
+        .badge { display: inline-block; padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+        .badge-llegada { background-color: #e0f2fe; color: #0369a1; }
+        .badge-salida { background-color: #fee2e2; color: #b91c1c; }
+        .badge-casa { background-color: #dcfce7; color: #15803d; }
+        .badge-tour { background-color: #f3e8ff; color: #7e22ce; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        @media (min-width: 600px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-color); }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; padding: 10px 12px; border: 1.5px solid var(--border-color); border-radius: 8px; 
+            font-size: 13.5px; outline: none; transition: var(--transition-smooth); background-color: #fdfdfd;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); background-color: #fff; }
+        
+        .selected-guest-box { 
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 5px solid var(--primary-light); 
+            padding: 14px; border-radius: 0 12px 12px 0; margin-bottom: 18px; font-size: 13.5px;
+            transition: var(--transition-smooth); animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .selected-guest-box.active { border-left-color: var(--success-color); background: #f0fdf4; }
+        .guest-item-tag { display: inline-block; background-color: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; margin: 3px; }
+        .guest-item-tag.has-debt { background-color: #fee2e2; color: #b91c1c; border: 1px dashed #fca5a5; }
+
+        .btn-submit { 
+            width: 100%; background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%); 
+            color: white; border: none; padding: 14px; border-radius: 10px; font-size: 14.5px; 
+            font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); transition: var(--transition-smooth);
+        }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3); }
+        .btn-submit:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; opacity: 0.6; }
+        
+        .log-item { border-bottom: 1px solid var(--border-color); padding: 12px 0; font-size: 13px; line-height: 1.5; }
+        .log-badge { background-color: #e2e8f0; color: #334155; padding: 2px 6px; border-radius: 4px; font-size: 10.5px; font-weight: bold; margin-right: 5px; display: inline-block; }
+        .log-service-badge { font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 4px; }
+        .empty-message { text-align: center; color: var(--text-light); padding: 35px; font-size: 14px; }
+
+        /* Estilos para edición rápida de Hora de Salida */
+        .time-edit-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .input-time-edit {
+            padding: 2px 6px !important;
+            font-size: 12px !important;
+            width: auto !important;
+            border-radius: 4px !important;
+        }
+        .btn-save-time {
+            background-color: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-save-time:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Botón de exportación a Excel */
+        .btn-export-excel {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-export-excel:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+        }
+
+        /* Estilos para los filtros de la bitácora */
+        .logs-filter-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .logs-filter-container input, .logs-filter-container select {
+            padding: 6px 8px;
+            font-size: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            width: 100%;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+<!-- Modal Inicio de Turno -->
+<div id="shiftModal" class="shift-modal-overlay">
+    <div class="shift-modal">
+        <h2>📋 Apertura de Turno</h2>
+        <p>Ingresa tus datos operativos para activar la bitácora.</p>
+        
+        <form id="shiftForm" onsubmit="startShift(event)">
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label for="shift_agent">Nombre del Agente *</label>
+                <input type="text" id="shift_agent" placeholder="Ej. Juan Pérez" required>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label for="shift_supervisor">Supervisor de Turno *</label>
+                <input type="text" id="shift_supervisor" placeholder="Ej. Roberto Solís" required>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="shift_turn">Turno *</label>
+                <select id="shift_turn" required>
+                    <option value="" disabled selected>Selecciona un turno...</option>
+                    <option value="1er Turno">1er Turno (Mañana)</option>
+                    <option value="2do Turno">2do Turno (Tarde)</option>
+                    <option value="3er Turno">3er Turno (Nocturno)</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-submit">🚀 Iniciar Turno</button>
+        </form>
+    </div>
+</div>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>C.R.A.P Dreams Sapphire</h1>
+            <p>Contro y Registro de Acceso Principal</p>
+            
+            <!-- Barra con datos de turno activo y botón de comité -->
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px;">
+                <a href="comite.html" class="btn-comite">🏛️ Ir a Comité</a>
+
+                <div id="activeShiftInfo" class="shift-info-bar" style="display: none;">
+                    <div>👤 <strong>Agente:</strong> <span id="lblAgent">-</span></div>
+                    <div>👔 <strong>Supervisor:</strong> <span id="lblSupervisor">-</span></div>
+                    <div>⏰ <strong>Turno:</strong> <span id="lblTurn">-</span></div>
+                    <button class="btn-end-shift" onclick="endShift()">🔴 Cerrar Turno</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card" style="border-color: rgba(37, 99, 235, 0.4);">
+                <div class="stat-val" style="color: #60a5fa;" id="cntLlegadas">0 / 0</div>
+                <div class="stat-lbl">🛫 Llegadas Reg.</div>
+            </div>
+            <div class="stat-card" style="border-color: rgba(239, 68, 68, 0.4);">
+                <div class="stat-val" style="color: #f87171;" id="cntSalidas">0 / 0</div>
+                <div class="stat-lbl">🛬 Salidas Reg.</div>
+            </div>
+            <div class="stat-card" style="border-color: rgba(16, 185, 129, 0.4);">
+                <div class="stat-val" style="color: #34d399;" id="cntCasa">0 / 0</div>
+                <div class="stat-lbl">🏡 En Casa Reg.</div>
+            </div>
+            <div class="stat-card" style="border-color: rgba(168, 85, 247, 0.4);">
+                <div class="stat-val" style="color: #c084fc;" id="cntTour">0 Pax</div>
+                <div class="stat-lbl">🚌 En Tour (Fuera)</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="upload-section">
+        <h3>📂 Importar o Actualizar Base de Huéspedes</h3>
+        <p style="font-size: 13px; color: var(--text-light); margin-bottom: 12px;">
+            Sube un archivo Excel para renovar la lista. Si ya tienes datos guardados, no es necesario volver a cargarlo.
+        </p>
+        <div class="upload-btn-wrapper">
+            <button class="btn-upload">Seleccionar Excel (.xlsx)</button>
+            <input type="file" id="excelFileInput" accept=".xlsx, .xls" />
+        </div>
+        <button class="btn-reset-db" onclick="resetDatabase()">🧹 Limpiar Todo</button>
+        <div id="uploadStatus" style="margin-top: 12px; font-weight: bold; font-size: 14px; transition: var(--transition-smooth);"></div>
+    </div>
+
+    <div class="main-layout">
+        <div class="card">
+            <div class="card-title">
+                <span>👥 Control de Huéspedes</span>
+                <span id="counterSelected" style="font-size: 13px; font-weight: 600; color: var(--primary-light); background: #eff6ff; padding: 4px 10px; border-radius: 8px; display: none;"></span>
+            </div>
+            
+            <div class="controls-row">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar por Apellido, Nombre, Habitación o #..." disabled>
+                </div>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="filterTab('TODOS', this)">Todos</button>
+                    <button class="tab-btn" onclick="filterTab('LLEGADA', this)">Llegadas</button>
+                    <button class="tab-btn" onclick="filterTab('SALIDA', this)">Salidas</button>
+                    <button class="tab-btn" onclick="filterTab('HDP EN CASA', this)">En Casa</button>
+                    <button class="tab-btn" onclick="filterTab('EN_TOUR', this)" style="color: #7e22ce; background: #f3e8ff; border: 1px solid #d8b4fe;">🚌 En Tour</button>
+                    <button class="tab-btn btn-c1000-filter" onclick="filterTab('SOLO_C1000', this)" style="color: #b45309; background: #fffbeb; border: 1px solid #fde68a;">⚠️ Solo C1000</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="checkbox-cell">Sel.</th>
+                            <th style="width: 50px; text-align: center;">#</th>
+                            <th>Nombre</th>
+                            <th>Hab.</th>
+                            <th>Estado</th>
+                            <th>Pax</th>
+                            <th>Cuenta</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guestsTableBody">
+                        <tr>
+                            <td colspan="7" class="empty-message">Por favor, carga el archivo de Excel arriba para activar la lista interactiva.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <div class="card" style="position: sticky; top: 20px;">
+                <div class="card-title">🚗 Registro de Control Vehicular y Salidas</div>
+                
+                <div class="register-tabs">
+                    <button type="button" class="reg-tab active" onclick="switchRegTab('TRANSPORTE')">Transporte</button>
+                    <button type="button" class="reg-tab" onclick="switchRegTab('TAXI')">Taxi</button>
+                    <button type="button" class="reg-tab" onclick="switchRegTab('ESTACIONAMIENTO')">Estacionamiento</button>
+                    <button type="button" class="reg-tab" onclick="switchRegTab('CAMINADO')">🚶 Caminado</button>
+                </div>
+
+                <div id="selectedGuestInfo" class="selected-guest-box">
+                    <strong>Modo Registro Libre Activo</strong>
+                    <div style="font-size: 12px; color: var(--text-light); margin-top: 4px;">Puedes rellenar los datos directamente o seleccionar huéspedes de la lista izquierda para autocompletar.</div>
+                </div>
+
+                <form id="registrationForm" onsubmit="handleFormSubmit(event)">
+                    <div class="form-grid" id="formGridContainer"></div>
+                    <button type="submit" id="submitBtn" class="btn-submit">Guardar Registro</button>
+                </form>
+
+                <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <div class="card-title" style="font-size: 16px; margin-bottom: 12px;">
+                        <span>📝 Registros de este Turno</span>
+                        <button type="button" class="btn-export-excel" onclick="exportLogsToExcel()">📊 Exportar Excel</button>
+                    </div>
+
+                    <!-- FILTROS DE REGISTROS -->
+                    <div class="logs-filter-container">
+                        <div>
+                            <input type="date" id="logFilterDate" onchange="renderLogs()" title="Filtrar por Fecha">
+                        </div>
+                        <div>
+                            <select id="logFilterTurn" onchange="renderLogs()" title="Filtrar por Turno">
+                                <option value="">Todos los turnos</option>
+                                <option value="1er Turno">1er Turno</option>
+                                <option value="2do Turno">2do Turno</option>
+                                <option value="3er Turno">3er Turno</option>
+                            </select>
+                        </div>
+                        <div>
+                            <input type="text" id="logFilterRoom" placeholder="Hab..." oninput="renderLogs()" title="Filtrar por Habitación">
+                        </div>
+                    </div>
+
+                    <div id="logsContainer">
+                        <div class="empty-message" style="padding: 15px;">No hay registros guardados en esta sesión.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Variables globales
+    let guestsData = JSON.parse(localStorage.getItem('sapphire_guests')) || []; 
+    let recentLogs = JSON.parse(localStorage.getItem('sapphire_logs')) || [];
+    let currentShift = JSON.parse(localStorage.getItem('sapphire_shift')) || null;
+    let selectedGuests = []; 
+    let currentFilterStatus = "TODOS";
+    let currentSearchQuery = "";
+    
+    // Categoría de Registro activa
+    let activeRegTab = "TRANSPORTE";
+
+    // Al arrancar la app, verifica estado del turno e importa datos guardados
+    window.onload = function() {
+        checkShiftStatus();
+        buildDynamicForm();
+        if (guestsData.length > 0) {
+            document.getElementById('searchInput').disabled = false;
+            document.getElementById('uploadStatus').style.color = "var(--success-color)";
+            document.getElementById('uploadStatus').innerText = `💾 Restaurado: ${guestsData.length} registros cargados de la sesión anterior.`;
+            renderTable();
+            renderLogs();
+            updateCounters();
+        }
+    };
+
+    // Funciones de control de Turnos
+    function checkShiftStatus() {
+        const modal = document.getElementById("shiftModal");
+        const infoBar = document.getElementById("activeShiftInfo");
+
+        if (currentShift) {
+            modal.style.display = "none";
+            infoBar.style.display = "flex";
+            document.getElementById("lblAgent").innerText = currentShift.agent;
+            document.getElementById("lblSupervisor").innerText = currentShift.supervisor;
+            document.getElementById("lblTurn").innerText = currentShift.turn;
+        } else {
+            modal.style.display = "flex";
+            infoBar.style.display = "none";
+        }
+    }
+
+    function startShift(e) {
+        e.preventDefault();
+        const agent = document.getElementById("shift_agent").value.trim();
+        const supervisor = document.getElementById("shift_supervisor").value.trim();
+        const turn = document.getElementById("shift_turn").value;
+
+        if (!agent || !supervisor || !turn) return;
+
+        currentShift = {
+            agent: agent,
+            supervisor: supervisor,
+            turn: turn,
+            startTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        localStorage.setItem('sapphire_shift', JSON.stringify(currentShift));
+        checkShiftStatus();
+    }
+
+    function endShift() {
+        if (confirm("🚨 ¿Deseas cerrar el turno actual? Se requerirá iniciar sesión nuevamente con los datos de un operador.")) {
+            localStorage.removeItem('sapphire_shift');
+            currentShift = null;
+            document.getElementById("shiftForm").reset();
+            checkShiftStatus();
+        }
+    }
+
+    function saveToLocalStorage() {
+        localStorage.setItem('sapphire_guests', JSON.stringify(guestsData));
+        localStorage.setItem('sapphire_logs', JSON.stringify(recentLogs));
+    }
+
+    document.getElementById('excelFileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const statusLabel = document.getElementById('uploadStatus');
+        statusLabel.style.color = "var(--primary-light)";
+        statusLabel.innerText = "Sincronizando base de datos local...";
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            
+            guestsData = [];
+            selectedGuests = [];
+            updateSelectedGuestUI();
+
+            workbook.SheetNames.forEach(sheetName => {
+                const sheet = workbook.Sheets[sheetName];
+                const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                
+                let tabStatus = "LLEGADA";
+                const nameUpper = sheetName.toUpperCase().trim();
+                if (nameUpper.includes("SALIDA")) tabStatus = "SALIDA";
+                if (nameUpper.includes("HDP EN CASA") || nameUpper.includes("CASA")) tabStatus = "HDP EN CASA";
+
+                rows.forEach(row => {
+                    if (!row || row.length < 2) return;
+
+                    const firstCell = String(row[0]).toUpperCase().trim();
+                    if (firstCell === "#" || firstCell === "NOMBRE" || firstCell.includes("TOTAL")) return;
+
+                    let numOriginal = row[0] ? String(row[0]).trim() : "-";
+                    let name = row[1] ? String(row[1]).trim() : "";
+                    let room = row[2] ? String(row[2]).trim() : "Por asignar";
+                    let adults = row[3] ? parseInt(row[3]) : 0;
+                    let kids = row[4] ? parseInt(row[4]) : 0;
+
+                    if (name && name !== "" && name !== "undefined") {
+                        let tieneDeuda = (tabStatus === "SALIDA" && (parseInt(numOriginal) % 4 === 0)); 
+
+                        guestsData.push({
+                            id: tabStatus + "_" + numOriginal + "_" + name.replace(/\s+/g, ''),
+                            number: numOriginal,
+                            name: name,
+                            room: room === "" ? "Por asignar" : room,
+                            status: tabStatus,
+                            ad: isNaN(adults) ? 0 : adults,
+                            men: isNaN(kids) ? 0 : kids,
+                            c1000: tieneDeuda ? "PENDIENTE" : "OK",
+                            registered: false,
+                            tourPax: 0
+                        });
+                    }
+                });
+            });
+
+            if (guestsData.length > 0) {
+                statusLabel.style.color = "var(--success-color)";
+                statusLabel.innerText = `✅ ¡Carga Exitosa! ${guestsData.length} registros guardados en este navegador.`;
+                document.getElementById('searchInput').disabled = false;
+                saveToLocalStorage();
+                renderTable();
+                updateCounters();
+            } else {
+                statusLabel.style.color = "red";
+                statusLabel.innerText = "❌ Formato incompatible.";
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    function resetDatabase() {
+        if (confirm("🚨 ¿Seguro que quieres borrar TODOS los huéspedes y bitácoras guardadas en el navegador?")) {
+            localStorage.removeItem('sapphire_guests');
+            localStorage.removeItem('sapphire_logs');
+            guestsData = [];
+            recentLogs = [];
+            selectedGuests = [];
+            
+            document.getElementById('searchInput').value = "";
+            document.getElementById('searchInput').disabled = true;
+            document.getElementById('uploadStatus').innerText = "";
+            
+            renderTable();
+            renderLogs();
+            updateSelectedGuestUI();
+            updateCounters();
+        }
+    }
+
+    function updateCounters() {
+        const llegadasTotales = guestsData.filter(g => g.status === "LLEGADA").length;
+        const llegadasReg = guestsData.filter(g => g.status === "LLEGADA" && g.registered).length;
+
+        const salidasTotales = guestsData.filter(g => g.status === "SALIDA").length;
+        const salidasReg = guestsData.filter(g => g.status === "SALIDA" && g.registered).length;
+
+        const casaTotales = guestsData.filter(g => g.status === "HDP EN CASA").length;
+        const casaReg = guestsData.filter(g => g.status === "HDP EN CASA" && g.registered).length;
+
+        let totalTourPax = guestsData.reduce((acc, g) => acc + (g.tourPax || 0), 0);
+
+        document.getElementById('cntLlegadas').innerText = `${llegadasReg} / ${llegadasTotales}`;
+        document.getElementById('cntSalidas').innerText = `${salidasReg} / ${salidasTotales}`;
+        document.getElementById('cntCasa').innerText = `${casaReg} / ${casaTotales}`;
+        document.getElementById('cntTour').innerText = `${totalTourPax} Pax`;
+    }
+
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+        currentSearchQuery = e.target.value.toLowerCase().trim();
+        renderTable();
+    });
+
+    function toggleC1000(guestId, event) {
+        event.stopPropagation(); 
+        const guest = guestsData.find(g => g.id === guestId);
+        if (guest) {
+            guest.c1000 = (guest.c1000 === "PENDIENTE") ? "LIQUIDADO" : "PENDIENTE";
+            saveToLocalStorage();
+            renderTable();
+            updateSelectedGuestUI();
+        }
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById("guestsTableBody");
+        tbody.innerHTML = "";
+
+        if (guestsData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-message">Por favor, carga el archivo de Excel arriba para activar la lista interactiva.</td></tr>`;
+            return;
+        }
+
+        const filtered = guestsData.filter(guest => {
+            let matchesStatus = false;
+            if (currentFilterStatus === "TODOS") matchesStatus = true;
+            else if (currentFilterStatus === "EN_TOUR") matchesStatus = (guest.tourPax > 0);
+            else if (currentFilterStatus === "SOLO_C1000") matchesStatus = (guest.status === "SALIDA" && guest.c1000 === "PENDIENTE");
+            else matchesStatus = (guest.status === currentFilterStatus);
+
+            const matchesSearch = guest.name.toLowerCase().includes(currentSearchQuery) || 
+                                   guest.room.toLowerCase().includes(currentSearchQuery) ||
+                                   guest.number.toLowerCase() === currentSearchQuery;
+            return matchesStatus && matchesSearch;
+        });
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-message">No se encontraron huéspedes con esa coincidencia.</td></tr>`;
+            return;
+        }
+
+        filtered.forEach((guest) => {
+            const isSelected = selectedGuests.some(g => g.id === guest.id);
+            const tr = document.createElement("tr");
+            if (isSelected) tr.className = "selected";
+
+            let badgeClass = "badge-casa";
+            let badgeText = guest.status === 'HDP EN CASA' ? 'En Casa' : guest.status;
+
+            if (guest.tourPax > 0) {
+                badgeClass = "badge-tour";
+                badgeText = `🚌 En Tour (${guest.tourPax} Pax)`;
+            } else if (guest.status === "LLEGADA") {
+                badgeClass = "badge-llegada";
+            } else if (guest.status === "SALIDA") {
+                badgeClass = "badge-salida";
+            }
+
+            if (guest.registered) {
+                tr.style.opacity = "0.7";
+            }
+
+            let c1000Cell = "<td>-</td>";
+            if (guest.status === "SALIDA") {
+                if (guest.c1000 === "PENDIENTE") {
+                    c1000Cell = `<td><button class="btn-c1000" onclick="toggleC1000('${guest.id}', event)">⚠️ C1000</button></td>`;
+                } else {
+                    c1000Cell = `<td><button class="btn-c1000 liquidado" onclick="toggleC1000('${guest.id}', event)">✅ Liquidado</button></td>`;
+                }
+            }
+
+            tr.innerHTML = `
+                <td class="checkbox-cell" onclick="event.stopPropagation(); toggleSelect('${guest.id}')">
+                    <input type="checkbox" ${isSelected ? 'checked' : ''}>
+                </td>
+                <td class="col-num">${guest.number}</td>
+                <td><strong>${guest.name} ${guest.registered ? '🚗' : ''}</strong></td>
+                <td>${guest.room}</td>
+                <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                <td>${guest.ad}A / ${guest.men}M</td>
+                ${c1000Cell}
+            `;
+
+            tr.addEventListener('click', () => toggleSelect(guest.id));
+            tbody.appendChild(tr);
+        });
+    }
+
+    function toggleSelect(guestId) {
+        const guestIndex = selectedGuests.findIndex(g => g.id === guestId);
+        if (guestIndex > -1) {
+            selectedGuests.splice(guestIndex, 1);
+        } else {
+            const guest = guestsData.find(g => g.id === guestId);
+            if (guest) selectedGuests.push(guest);
+        }
+        renderTable();
+        updateSelectedGuestUI();
+    }
+
+    function switchRegTab(tabName) {
+        activeRegTab = tabName;
+        document.querySelectorAll(".reg-tab").forEach(btn => {
+            if (btn.innerText.toUpperCase().includes(tabName)) btn.classList.add("active");
+            else btn.classList.remove("active");
+        });
+        buildDynamicForm();
+        updateSelectedGuestUI();
+    }
+
+    function buildDynamicForm() {
+        const container = document.getElementById("formGridContainer");
+        container.innerHTML = "";
+
+        const schemas = {
+            TRANSPORTE: [
+                { id: "f_hora_ent", label: "Hora de Entrada", type: "time", required: true },
+                { id: "f_conductor", label: "Nombre del Conductor", type: "text", placeholder: "Ej. Juan Pérez", required: true },
+                { id: "f_num_econ", label: "Número Económico", type: "text", placeholder: "Ej. TR-405" },
+                { id: "f_agencia", label: "Agencia", type: "text", placeholder: "Ej. BD Experience", required: true },
+                { id: "f_placas", label: "Placas", type: "text", placeholder: "Ej. MEX-88-99", required: true },
+                { id: "f_room", label: "Habitación", type: "text", required: true },
+                { id: "f_pax", label: "Pax (Total de Personas)", type: "number", required: true },
+                { id: "f_hora_sal", label: "Hora de Salida", type: "time" },
+                { id: "f_servicio", label: "Servicio", type: "select", options: ["Llegada(in)", "Salida (out)", "Salida de tour (ST)", "Retorno(RT)"], required: true }
+            ],
+            TAXI: [
+                { id: "f_hora_ent", label: "Hora de Entrada", type: "time", required: true },
+                { id: "f_conductor", label: "Nombre del Conductor", type: "text", placeholder: "Ej. Carlos Gómez", required: true },
+                { id: "f_num_econ", label: "Número Económico", type: "text", placeholder: "Ej. TX-1024", required: true },
+                { id: "f_placas", label: "Placas", type: "text", placeholder: "Ej. PL-775-AA", required: true },
+                { id: "f_room", label: "Habitación", type: "text", required: true },
+                { id: "f_pax", label: "Pax (Total de Personas)", type: "number", required: true },
+                { id: "f_hora_sal", label: "Hora de Salida", type: "time" },
+                { id: "f_servicio", label: "Servicio", type: "select", options: ["Llegada(in)", "Salida (out)", "Salida de tour (ST)", "Retorno(RT)"], required: true }
+            ],
+            ESTACIONAMIENTO: [
+                { id: "f_hora_ent", label: "Hora de Entrada", type: "time", required: true },
+                { id: "f_conductor", label: "Nombre de Conductor (Huésped)", type: "text", placeholder: "Ej. Dueño del auto", required: true },
+                { id: "f_vehiculo", label: "Vehículo (Marca/Modelo)", type: "text", placeholder: "Ej. Toyota Hilux", required: true },
+                { id: "f_color", label: "Color", type: "text", placeholder: "Ej. Gris Metálico", required: true },
+                { id: "f_placas", label: "Placas", type: "text", placeholder: "Ej. UT-124-C", required: true },
+                { id: "f_room", label: "Habitación", type: "text", required: true },
+                { id: "f_pax", label: "Pax (Total de Personas)", type: "number", required: true },
+                { id: "f_hora_sal", label: "Hora de Salida", type: "time" },
+                { id: "f_servicio", label: "Servicio", type: "select", options: ["Llegada(in)", "Salida (out)", "Salida de tour (ST)", "Retorno(RT)"], required: true }
+            ],
+            CAMINADO: [
+                { id: "f_hora_ent", label: "Hora de entrada", type: "time", required: true },
+                { id: "f_conductor", label: "Nombre de huésped", type: "text", placeholder: "Ej. Nombre del huésped", required: true },
+                { id: "f_room", label: "Habitación", type: "text", required: true },
+                { id: "f_pax", label: "Pax", type: "number", required: true },
+                { id: "f_hora_sal", label: "Hora de salida", type: "time" },
+                { id: "f_servicio", label: "Servicio", type: "select", options: ["Llegada(in)", "Salida (out)", "Salida de tour (ST)", "Retorno(RT)"], required: true }
+            ]
+        };
+
+        const currentSchema = schemas[activeRegTab];
+
+        currentSchema.forEach(field => {
+            const group = document.createElement("div");
+            group.className = "form-group";
+            if (field.id === "f_servicio") group.className = "form-group full-width";
+
+            let inputHtml = "";
+            const reqAttr = field.required ? "required" : "";
+
+            if (field.type === "time") {
+                inputHtml = `<input type="time" id="${field.id}" ${reqAttr}>`;
+            } else if (field.type === "number") {
+                inputHtml = `<input type="number" min="1" id="${field.id}" placeholder="0" ${reqAttr}>`;
+            } else if (field.type === "select") {
+                let optionsHtml = `<option value="" disabled selected>Selecciona una opción...</option>`;
+                field.options.forEach(opt => {
+                    optionsHtml += `<option value="${opt}">${opt}</option>`;
+                });
+                inputHtml = `<select id="${field.id}" ${reqAttr}>${optionsHtml}</select>`;
+            } else {
+                inputHtml = `<input type="text" id="${field.id}" placeholder="${field.placeholder || ''}" ${reqAttr}>`;
+            }
+
+            group.innerHTML = `
+                <label for="${field.id}">${field.label}${field.required ? ' *' : ''}</label>
+                ${inputHtml}
+            `;
+            container.appendChild(group);
+        });
+
+        const hourInp = document.getElementById("f_hora_ent");
+        if (hourInp) {
+            const now = new Date();
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            hourInp.value = `${hh}:${mm}`;
+        }
+    }
+
+    function updateSelectedGuestUI() {
+        const infoBox = document.getElementById("selectedGuestInfo");
+        const counter = document.getElementById("counterSelected");
+
+        if (selectedGuests.length === 0) {
+            infoBox.classList.remove("active");
+            infoBox.innerHTML = `
+                <strong>Modo Registro Libre Activo</strong>
+                <div style="font-size: 12px; color: var(--text-light); margin-top: 4px;">Puedes rellenar los datos directamente o seleccionar huéspedes de la lista izquierda para autocompletar.</div>
+            `;
+            counter.style.display = "none";
+        } else {
+            infoBox.classList.add("active");
+            counter.style.display = "inline-block";
+            counter.innerText = `👥 ${selectedGuests.length} seleccionados`;
+
+            let hasDebtors = selectedGuests.some(g => g.status === "SALIDA" && g.c1000 === "PENDIENTE");
+            if (hasDebtors) infoBox.style.borderLeftColor = "var(--warning-color)";
+            else infoBox.style.borderLeftColor = "var(--success-color)";
+
+            let listHtml = `<div style="margin-bottom: 8px;"><strong>👥 Grupo a Registrar en ${activeRegTab}:</strong></div>`;
+            selectedGuests.forEach(g => {
+                let debtClass = (g.status === "SALIDA" && g.c1000 === "PENDIENTE") ? "has-debt" : "";
+                let debtLabel = (g.status === "SALIDA" && g.c1000 === "PENDIENTE") ? " ⚠ (DEBE C1000)" : "";
+                listHtml += `<span class="guest-item-tag ${debtClass}">#${g.number} ${g.name} (Hab. ${g.room})${debtLabel}</span> `;
+            });
+
+            infoBox.innerHTML = listHtml;
+
+            const roomInp = document.getElementById("f_room");
+            if (roomInp) {
+                roomInp.value = selectedGuests[0].room;
+            }
+
+            const nameInp = document.getElementById("f_conductor");
+            if (nameInp && activeRegTab === "CAMINADO") {
+                nameInp.value = selectedGuests.map(g => g.name).join(", ");
+            }
+
+            const paxInp = document.getElementById("f_pax");
+            if (paxInp) {
+                let sumPax = selectedGuests.reduce((acc, curr) => acc + (curr.ad || 0) + (curr.men || 0), 0);
+                paxInp.value = sumPax || 1;
+            }
+        }
+    }
+
+    function filterTab(status, element) {
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        element.classList.add("active");
+        currentFilterStatus = status;
+        renderTable();
+    }
+
+    function handleFormSubmit(event) {
+        event.preventDefault();
+        
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+
+        const logData = {
+            id: Date.now(),
+            date: dateStr,
+            category: activeRegTab,
+            timestamp: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            agent: currentShift ? currentShift.agent : "Manual",
+            supervisor: currentShift ? currentShift.supervisor : "-",
+            turn: currentShift ? currentShift.turn : "-",
+            guests: selectedGuests.length > 0 ? [...selectedGuests] : [{ number: "Libre", room: document.getElementById("f_room") ? document.getElementById("f_room").value : "-", name: document.getElementById("f_conductor") ? document.getElementById("f_conductor").value : "Registro Manual" }],
+            fields: {}
+        };
+
+        const fields = document.getElementById("formGridContainer").querySelectorAll("input, select");
+        fields.forEach(f => {
+            const labelNode = document.querySelector(`label[for="${f.id}"]`);
+            const labelText = labelNode ? labelNode.innerText.replace('*', '').trim() : f.id;
+            logData.fields[labelText] = f.value || "-";
+        });
+
+        // Automatizar conteo y control de retornos (soporta Retorno(RT) o Retorno (RT))
+        const servicioVal = logData.fields["Servicio"] || "";
+        const formPax = parseInt(logData.fields["Pax (Total de Personas)"] || logData.fields["Pax"] || 1);
+
+        if (servicioVal) {
+            selectedGuests.forEach(sg => {
+                const match = guestsData.find(g => g.id === sg.id);
+                if (match) {
+                    match.registered = true;
+                    if (servicioVal.includes("Salida de tour")) {
+                        match.tourPax = (match.tourPax || 0) + Math.round(formPax / selectedGuests.length);
+                    } else if (servicioVal.includes("Retorno")) {
+                        match.tourPax = Math.max(0, (match.tourPax || 0) - Math.round(formPax / selectedGuests.length));
+                    }
+                }
+            });
+
+            if (selectedGuests.length === 0) {
+                const roomVal = document.getElementById("f_room") ? document.getElementById("f_room").value.trim() : "";
+                if (roomVal) {
+                    const existingGuests = guestsData.filter(g => g.room.toLowerCase() === roomVal.toLowerCase());
+                    if (existingGuests.length > 0) {
+                        const splitPax = Math.max(1, Math.round(formPax / existingGuests.length));
+                        existingGuests.forEach(existingGuest => {
+                            if (servicioVal.includes("Salida de tour")) {
+                                existingGuest.tourPax = (existingGuest.tourPax || 0) + splitPax;
+                            } else if (servicioVal.includes("Retorno")) {
+                                existingGuest.tourPax = Math.max(0, (existingGuest.tourPax || 0) - splitPax);
+                            }
+                        });
+                    }
+                }
+            }
+        } else {
+            selectedGuests.forEach(sg => {
+                const match = guestsData.find(g => g.id === sg.id);
+                if (match) match.registered = true;
+            });
+        }
+
+        recentLogs.unshift(logData);
+        saveToLocalStorage();
+
+        renderLogs();
+        updateCounters();
+
+        document.getElementById("registrationForm").reset();
+        
+        selectedGuests = [];
+        updateSelectedGuestUI();
+        buildDynamicForm();
+        renderTable();
+    }
+
+    function updateLogExitTime(logId) {
+        const timeInput = document.getElementById(`time_exit_${logId}`);
+        if (!timeInput) return;
+        
+        const newTime = timeInput.value;
+        const log = recentLogs.find(l => l.id === logId);
+        
+        if (log) {
+            log.fields["Hora de salida"] = newTime || "-";
+            saveToLocalStorage();
+            renderLogs();
+        }
+    }
+
+    // EXPORTACIÓN A EXCEL OPTIMIZADA CON BASE64
+    function exportLogsToExcel() {
+        if (recentLogs.length === 0) {
+            alert("⚠️ No hay registros en la bitácora para exportar.");
+            return;
+        }
+
+        const logsByDate = {};
+        recentLogs.forEach(log => {
+            const dateKey = log.date || "Sin_Fecha";
+            if (!logsByDate[dateKey]) {
+                logsByDate[dateKey] = [];
+            }
+            logsByDate[dateKey].push(log);
+        });
+
+        const workbook = XLSX.utils.book_new();
+
+        Object.keys(logsByDate).sort().reverse().forEach(dateKey => {
+            const dayLogs = logsByDate[dateKey];
+            
+            const exportData = dayLogs.map((log, index) => {
+                const row = {
+                    "#": index + 1,
+                    "Fecha": log.date || "-",
+                    "Hora Registro": log.timestamp || "-",
+                    "Categoría": log.category || "-",
+                    "Agente": log.agent || "-",
+                    "Supervisor": log.supervisor || "-",
+                    "Turno": log.turn || "-",
+                    "Huéspedes": log.guests ? log.guests.map(g => g.name).join(", ") : "-",
+                    "Habitación": log.fields ? (log.fields["Habitación"] || "-") : "-",
+                    "Pax": log.fields ? (log.fields["Pax (Total de Personas)"] || log.fields["Pax"] || "-") : "-"
+                };
+
+                if (log.fields) {
+                    for (const [key, val] of Object.entries(log.fields)) {
+                        if (key !== "Habitación" && key !== "Pax (Total de Personas)" && key !== "Pax") {
+                            row[key] = val;
+                        }
+                    }
+                }
+
+                return row;
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            let sheetName = dateKey;
+            XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        });
+
+        const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'base64' });
+        const fileName = `Bitacora_Dreams_Sapphire_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+        const a = document.createElement('a');
+        a.href = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + wbout;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function renderLogs() {
+        const container = document.getElementById("logsContainer");
+        container.innerHTML = "";
+
+        const filterDate = document.getElementById("logFilterDate") ? document.getElementById("logFilterDate").value : "";
+        const filterTurn = document.getElementById("logFilterTurn") ? document.getElementById("logFilterTurn").value : "";
+        const filterRoom = document.getElementById("logFilterRoom") ? document.getElementById("logFilterRoom").value.trim().toLowerCase() : "";
+
+        const filteredLogs = recentLogs.filter(log => {
+            let logDateFormatted = "";
+            if (log.date) {
+                logDateFormatted = log.date.split('T')[0];
+            }
+
+            const matchesDate = !filterDate || (logDateFormatted === filterDate);
+            const matchesTurn = !filterTurn || (log.turn === filterTurn);
+            
+            let matchesRoom = true;
+            if (filterRoom) {
+                const roomInFields = log.fields && log.fields["Habitación"] ? log.fields["Habitación"].toString().toLowerCase() : "";
+                const roomInGuests = log.guests ? log.guests.some(g => g.room && g.room.toString().toLowerCase().includes(filterRoom)) : false;
+                matchesRoom = roomInFields.includes(filterRoom) || roomInGuests;
+            }
+
+            return matchesDate && matchesTurn && matchesRoom;
+        });
+        
+        if (filteredLogs.length === 0) {
+            container.innerHTML = '<div class="empty-message" style="padding:15px;">No hay registros que coincidan con los filtros seleccionados.</div>';
+            return;
+        }
+
+        filteredLogs.forEach(log => {
+            const div = document.createElement("div");
+            div.className = "log-item";
+
+            let colorBadge = "#3b82f6";
+            if (log.category === "TAXI") colorBadge = "#eab308";
+            if (log.category === "ESTACIONAMIENTO") colorBadge = "#10b981";
+            if (log.category === "CAMINADO") colorBadge = "#8b5cf6";
+
+            let guestsTags = log.guests ? log.guests.map(g => {
+                let statusIcon = (g.status === "SALIDA" && g.c1000 === "PENDIENTE") ? "⚠" : "";
+                return `<span class="log-badge">${statusIcon} #${g.number || '-'} Hab. ${g.room || '-'}</span>`;
+            }).join("") : "";
+
+            let fieldsList = "";
+            if (log.fields) {
+                for (const [key, val] of Object.entries(log.fields)) {
+                    if (key === "Hora de salida") {
+                        const currentVal = (val && val !== "-") ? val : "";
+                        fieldsList += `
+                            <div class="time-edit-container">
+                                • <strong>${key}:</strong> 
+                                <input type="time" id="time_exit_${log.id}" class="input-time-edit" value="${currentVal}">
+                                <button type="button" class="btn-save-time" onclick="updateLogExitTime(${log.id})">💾</button>
+                            </div>`;
+                    } else {
+                        fieldsList += `<div style="margin-bottom: 2px;">• <strong>${key}:</strong> ${val}</div>`;
+                    }
+                }
+            }
+
+            const displayDate = log.date ? log.date.split('T')[0] : 'Sin fecha';
+
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span class="log-service-badge" style="background-color: ${colorBadge}; color: white; margin-bottom:0;">${log.category}</span>
+                    <span style="font-size: 11.5px; color: var(--text-light);">📅 ${displayDate} | 🕒 ${log.timestamp || ''}</span>
+                </div>
+                
+                <div style="margin: 4px 0;">${guestsTags}</div>
+                <div style="font-size: 13px; margin: 4px 0;">👤 <strong>Huésped:</strong> ${log.guests ? log.guests.map(g => g.name).join(", ") : '-'}</div>
+                
+                <div style="background: #f8fafc; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 12px; margin-top: 6px; color: var(--text-color);">
+                    ${fieldsList}
+                    <div style="border-top: 1px dashed var(--border-color); margin-top: 6px; padding-top: 4px; font-size: 11px; color: var(--text-light);">
+                        👨‍💼 <strong>Agente:</strong> ${log.agent || '-'} | 👔 <strong>Supervisor:</strong> ${log.supervisor || '-'} (${log.turn || '-'})
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+</script>
+</body>
+</html>
