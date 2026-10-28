@@ -3,137 +3,209 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Administración - Registros</title>
+  <title>C.R.A.P - Panel de Administración</title>
 
   <!-- Librería ligera y confiable para Canvas QR -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 
   <style>
     :root {
-      --primary: #2563eb;
+      --primary-color: #0f172a;
+      --primary-light: #2563eb;
       --primary-hover: #1d4ed8;
-      --success: #10b981;
+      --success-color: #10b981;
       --success-hover: #059669;
-      --danger: #ef4444;
+      --danger-color: #ef4444;
       --danger-hover: #dc2626;
-      --bg: #f8fafc;
+      --bg-color: #f1f5f9;
       --card-bg: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
+      --text-color: #1e293b;
+      --text-light: #64748b;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+      --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Estilos de Modo Oscuro Avanzado */
+    body.dark-mode {
+      --bg-color: #050b14;
+      --card-bg: #111827;
+      --text-color: #f9fafb;
+      --text-light: #9ca3af;
+      --border-color: #1f2937;
+      --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+      --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+      --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+    }
+    body.dark-mode th {
+      background-color: #1f2937;
+      color: #f9fafb;
+      border-bottom-color: #374151;
+    }
+    body.dark-mode td {
+      border-bottom-color: #1f2937;
+    }
+    body.dark-mode tr:hover {
+      background-color: #1f2937 !important;
+    }
+    body.dark-mode input[type="text"] {
+      background: #0b132b;
+      color: #f9fafb;
+      border-color: #1f2937;
+    }
+    body.dark-mode .tabs-container {
+      background: #1f2937;
+    }
+    body.dark-mode .qr-box {
+      background: #0b132b;
+      border-color: #1f2937;
+    }
+    body.dark-mode .modal-card {
+      background: #111827;
+      color: #f9fafb;
+    }
+    body.dark-mode .btn-orden {
+      background: #1f2937;
+      color: #f9fafb;
+      border-color: #374151;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
+      background-color: var(--bg-color);
+      color: var(--text-color);
       padding: 30px 20px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      transition: background-color 0.4s ease, color 0.4s ease;
     }
 
     .container {
-      max-width: 1100px;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 1400px;
     }
 
     header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow-lg);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
     }
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    @media (min-width: 1024px) {
+      header { flex-direction: row; justify-content: space-between; align-items: center; }
+    }
+    header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+    header p { color: #93c5fd; font-size: 14px; margin-top: 6px; font-weight: 500; }
 
-    h1 {
-      font-size: 1.75rem;
+    .btn-admin {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 12.5px;
       font-weight: 700;
-    }
-
-    .btn-salir {
-      background-color: #f1f5f9;
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 10px 18px;
-      border-radius: 8px;
       cursor: pointer;
-      font-weight: 600;
-      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+      backdrop-filter: blur(4px);
+    }
+    .btn-admin:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    .btn-salir:hover {
-      background-color: #e2e8f0;
-    }
-
-    /* Pestañas (Tabs) */
+    /* Pestañas */
     .tabs-container {
       display: flex;
-      gap: 10px;
-      margin-bottom: 24px;
-      border-bottom: 2px solid var(--border);
-      padding-bottom: 2px;
+      gap: 8px;
+      margin-bottom: 25px;
+      background: #e2e8f0;
+      padding: 6px;
+      border-radius: 14px;
     }
 
     .tab-btn {
-      padding: 10px 20px;
+      flex: 1;
+      padding: 12px 20px;
       border: none;
-      background: none;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-muted);
+      background: transparent;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-light);
       cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all 0.2s ease;
-      margin-bottom: -2px;
+      border-radius: 10px;
+      transition: var(--transition-smooth);
+      text-transform: uppercase;
     }
-
+    .tab-btn:hover { color: var(--text-color); }
     .tab-btn.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
+      background: var(--card-bg);
+      color: var(--primary-light);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
     }
 
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
     .admin-grid {
       display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 24px;
-      margin-bottom: 28px;
+      grid-template-columns: 1fr;
+      gap: 25px;
+      margin-bottom: 25px;
     }
-
-    @media (max-width: 850px) {
-      .admin-grid {
-        grid-template-columns: 1fr;
-      }
+    @media (min-width: 850px) {
+      .admin-grid { grid-template-columns: 1fr 380px; }
     }
 
     .card {
       background: var(--card-bg);
-      border-radius: 14px;
-      padding: 24px;
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      padding: 30px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition-smooth);
+      margin-bottom: 25px;
     }
-
-    .card-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 18px;
-    }
+    .card:hover { box-shadow: var(--shadow-md); }
+    .card h3, .card-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--text-color); letter-spacing: -0.3px; }
 
     .form-grid {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
       margin-bottom: 20px;
     }
 
@@ -144,45 +216,47 @@
     }
 
     label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-color);
     }
 
-    input {
-      padding: 10px 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.95rem;
-      background-color: #f8fafc;
+    input[type="text"] {
+      padding: 12px 16px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 14px;
+      background-color: var(--card-bg);
+      color: var(--text-color);
       outline: none;
+      width: 100%;
+      transition: var(--transition-smooth);
     }
-
-    input:focus {
-      background-color: #ffffff;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    input[type="text"]:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
     }
 
     .btn {
       border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 600;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 800;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: var(--transition-smooth);
+      box-shadow: var(--shadow-sm);
+      width: 100%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 100%;
     }
+    .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
-    .btn-primary { background-color: var(--primary); color: white; }
-    .btn-primary:hover { background-color: var(--primary-hover); }
-
-    .btn-success { background-color: var(--success); color: white; }
-    .btn-success:hover { background-color: var(--success-hover); }
+    .btn-primary { background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-hover) 100%); color: white; }
+    .btn-success { background: linear-gradient(135deg, var(--success-color) 0%, var(--success-hover) 100%); color: white; }
+    .btn-danger { background: linear-gradient(135deg, var(--danger-color) 0%, var(--danger-hover) 100%); color: white; }
+    .btn-info { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; }
 
     /* Panel Generador QR */
     .qr-preview-card {
@@ -194,100 +268,113 @@
     }
 
     .qr-box {
-      width: 180px;
-      height: 180px;
-      border: 2px dashed var(--border);
-      border-radius: 12px;
+      width: 200px;
+      height: 200px;
+      border: 2px dashed var(--border-color);
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 16px;
-      background: #fafafa;
+      margin-bottom: 20px;
+      background: #f8fafc;
     }
 
     .qrCanvas {
-      width: 160px;
-      height: 160px;
-      border-radius: 6px;
+      width: 170px;
+      height: 170px;
+      border-radius: 8px;
     }
 
     .qr-placeholder {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      padding: 10px;
-    }
-
-    /* Tabla */
-    .table-container { overflow-x: auto; }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f1f5f9;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--text-light);
+      padding: 15px;
       font-weight: 600;
     }
 
-    td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
+    /* Barra de filtros superior en tabla */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      background: #f8fafc;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border-color);
     }
+    body.dark-mode .filter-bar { background: #0b132b; }
+    .filter-bar input[type="text"] { flex-grow: 1; min-width: 240px; }
+
+    .btn-clear {
+      background: var(--card-bg);
+      color: var(--text-color);
+      border: 1.5px solid var(--border-color);
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      transition: var(--transition-smooth);
+    }
+    .btn-clear:hover { border-color: var(--primary-light); transform: translateY(-1px); }
+
+    /* Tabla */
+    .table-container { overflow-x: auto; border: 1.5px solid var(--border-color); border-radius: 14px; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+    th { background-color: var(--card-bg); color: var(--text-color); font-weight: 700; padding: 16px 18px; border-bottom: 2px solid var(--border-color); }
+    td { padding: 12px 18px; border-bottom: 1px solid var(--border-color); color: var(--text-color); transition: var(--transition-smooth); vertical-align: middle; }
+    tr:hover { background-color: #f8fafc; }
 
     .num-orden {
-      font-weight: 700;
-      color: var(--primary);
+      font-weight: 800;
+      color: var(--primary-light);
       text-align: center;
     }
 
     .btn-orden-container {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
     }
 
     .btn-orden {
       background: #f1f5f9;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 2px 6px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 3px 8px;
       cursor: pointer;
-      font-size: 0.75rem;
+      font-size: 11px;
+      font-weight: 700;
+      transition: var(--transition-smooth);
     }
+    .btn-orden:hover { background: var(--primary-light); color: white; border-color: var(--primary-light); }
 
     .qr-thumb {
       width: 48px;
       height: 48px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
-
     .qr-thumb:hover {
       transform: scale(1.15);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
 
-    .actions { display: flex; gap: 8px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
     .btn-sm {
-      padding: 7px 12px;
-      font-size: 0.82rem;
-      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 8px;
       text-decoration: none;
+      cursor: pointer;
+      border: none;
     }
-
-    .btn-danger { background-color: var(--danger); color: white; }
-    .btn-danger:hover { background-color: var(--danger-hover); }
 
     .hidden { display: none !important; }
 
@@ -298,17 +385,16 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.3s ease;
     }
-
     .modal-overlay.active {
       opacity: 1;
       pointer-events: auto;
@@ -316,16 +402,15 @@
 
     .modal-card {
       background: #ffffff;
-      padding: 28px;
-      border-radius: 16px;
+      padding: 30px;
+      border-radius: 20px;
       text-align: center;
-      max-width: 320px;
+      max-width: 360px;
       width: 90%;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-lg);
       transform: scale(0.9);
-      transition: transform 0.25s ease;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-
     .modal-overlay.active .modal-card {
       transform: scale(1);
     }
@@ -333,15 +418,21 @@
     .modal-card img {
       width: 240px;
       height: 240px;
-      border-radius: 8px;
+      border-radius: 12px;
       margin: 16px 0;
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border-color);
     }
 
     .modal-info {
-      font-size: 0.9rem;
-      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-light);
       margin-bottom: 20px;
+    }
+
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(10px); } 
+      to { opacity: 1; transform: translateY(0); } 
     }
   </style>
 </head>
@@ -349,8 +440,15 @@
 
   <div class="container">
     <header>
-      <h1>Panel de Administración</h1>
-      <button class="btn-salir" onclick="window.location.href='index.html'">Volver</button>
+      <div>
+        <h1>⚙️ Panel de Administración</h1>
+        <p>Gestión de Registros, Datos y Códigos QR</p>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <button class="btn-admin" onclick="window.location.href='comite.html'">📋 Ir al Control</button>
+        <button class="btn-admin" onclick="window.location.href='index.html'">🏠 Inicio PWA</button>
+        <button class="btn-admin" onclick="toggleTheme()" title="Cambiar Tema" id="themeToggleBtn">🌙</button>
+      </div>
     </header>
 
     <!-- Pestañas de Navegación -->
@@ -368,15 +466,15 @@
             <div class="form-grid">
               <div class="input-group">
                 <label for="c_nombre">Nombre Completo</label>
-                <input type="text" id="c_nombre" placeholder="Ej. Ana María Gómez" required>
+                <input type="text" id="c_nombre" placeholder="Ej. SALVADOR GUTIERREZ" required>
               </div>
               <div class="input-group">
                 <label for="c_puesto">Puesto</label>
-                <input type="text" id="c_puesto" placeholder="Ej. Presidenta" required>
+                <input type="text" id="c_puesto" placeholder="Ej. DIRECTOR GENERAL" required>
               </div>
               <div class="input-group">
-                <label for="c_numero">Número (en letras)</label>
-                <input type="text" id="c_numero" placeholder="Ej. Cuarenta y dos" required>
+                <label for="c_clave">Clave</label>
+                <input type="text" id="c_clave" placeholder="Ej. CE-01" required>
               </div>
             </div>
             <button type="submit" class="btn btn-primary">Generar Código QR</button>
@@ -395,22 +493,31 @@
         </div>
       </div>
 
-      <div class="card table-container">
+      <div class="card">
         <div class="card-title">Registros del Comité</div>
-        <table>
-          <thead>
-            <tr>
-              <th style="text-align: center;">#</th>
-              <th>Orden</th>
-              <th>QR (Clic para ampliar)</th>
-              <th>Nombre</th>
-              <th>Puesto</th>
-              <th>Número</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tablaComite"></tbody>
-        </table>
+        
+        <div class="filter-bar">
+          <label for="c_searchFilter">🔍 Buscar:</label>
+          <input type="text" id="c_searchFilter" placeholder="Buscar por Nombre, Puesto o Clave..." oninput="renderizarTablaComite()">
+          <button class="btn-clear" onclick="document.getElementById('c_searchFilter').value=''; renderizarTablaComite();">🔄 Limpiar</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align: center;">#</th>
+                <th>Orden</th>
+                <th>QR (Clic para ampliar)</th>
+                <th>Nombre</th>
+                <th>Puesto</th>
+                <th>Clave</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaComite"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -458,27 +565,35 @@
         </div>
       </div>
 
-      <div class="card table-container">
+      <div class="card">
         <div class="card-title">Registros de Colegas y Vehículos</div>
-        <table>
-          <thead>
-            <tr>
-              <th style="text-align: center;">#</th>
-              <th>Orden</th>
-              <th>QR (Clic para ampliar)</th>
-              <th>N° Colega</th>
-              <th>Nombre</th>
-              <th>Modelo</th>
-              <th>Color</th>
-              <th>Placas</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tablaColega"></tbody>
-        </table>
+
+        <div class="filter-bar">
+          <label for="v_searchFilter">🔍 Buscar:</label>
+          <input type="text" id="v_searchFilter" placeholder="Buscar por Nombre, Colega o Placas..." oninput="renderizarTablaColega()">
+          <button class="btn-clear" onclick="document.getElementById('v_searchFilter').value=''; renderizarTablaColega();">🔄 Limpiar</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align: center;">#</th>
+                <th>Orden</th>
+                <th>QR (Clic para ampliar)</th>
+                <th>N° Colega</th>
+                <th>Nombre</th>
+                <th>Modelo</th>
+                <th>Color</th>
+                <th>Placas</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaColega"></tbody>
+          </table>
+        </div>
       </div>
     </div>
-
   </div>
 
   <!-- Modal para ver el QR ampliado -->
@@ -492,22 +607,101 @@
   </div>
 
   <script>
+    // Lista oficial precargada con los 46 miembros del comité
+    const miembrosComiteOficial = [
+      { id: 1, nombre: "SALVADOR GUTIERREZ", puesto: "DIRECTOR GENERAL", clave: "CE-01" },
+      { id: 2, nombre: "MARIA FERNANDA CEBALLOS", puesto: "DIRECTORA DE DIVISION CUARTOS", clave: "CE-02" },
+      { id: 3, nombre: "POR ASIGNAR", puesto: "CLUSTER DIRECTOR OF REVENUE MANAGEMENT", clave: "CE-03" },
+      { id: 4, nombre: "RENE MACIN", puesto: "DIRECTOR DE ALIMENTOS Y BEBIDAS", clave: "CE-04" },
+      { id: 5, nombre: "EMMANUEL JIMENEZ", puesto: "DIRECTOR DE INGENIERIA", clave: "CE-05" },
+      { id: 6, nombre: "POR ASIGNAR", puesto: "DIRECTOR DE FINANZAS CLUSTER", clave: "CE-06" },
+      { id: 7, nombre: "ANAHI QUIROZ", puesto: "DIRECTORA DE ENTRETENIMIENTO", clave: "CE-07" },
+      { id: 8, nombre: "GABRIELA GONZALEZ", puesto: "DIRECTORA CLOSTER DE R.H", clave: "CE-08" },
+      { id: 9, nombre: "POR ASIGNAR", puesto: "DIRECTOR DE VENTAS CLOSTER", clave: "CE-09" },
+      { id: 10, nombre: "MÓNICA GÓMEZ", puesto: "CLUSTER SENIOR GROUPS", clave: "CE-10" },
+      { id: 11, nombre: "GABRIELA AURIOLA / AURIQE?", puesto: "REVENUE MANAGER CLUSTER", clave: "CE-11" },
+      { id: 12, nombre: "LEONOR JARQUIN", puesto: "RESERVATION MANAGER CLUSTER", clave: "CE-12" },
+      { id: 13, nombre: "JAIME MAURICIO AYALA", puesto: "DIRECTOR CLUSTER DE MARKETING", clave: "CO-01" },
+      { id: 14, nombre: "CARLOS MELENDEZ", puesto: "MANAGER ON DUTY", clave: "CO-02" },
+      { id: 15, nombre: "REGINA NAVARRETE", puesto: "MANAGER ON DUTY", clave: "CO-03" },
+      { id: 16, nombre: "DIANA ANAID HERNANDEZ", puesto: "ASISTENTE DE GERENCIA", clave: "CO-04" },
+      { id: 17, nombre: "NANCY MIDORI JIMENEZ", puesto: "GERENTE DE RECEPCION", clave: "CO-05" },
+      { id: 18, nombre: "ARLEN DIAZ", puesto: "GERENTE DE CLUB PREFERRED", clave: "CO-06" },
+      { id: 19, nombre: "XIOMARA GUADALUPE", puesto: "GERENTE SPA", clave: "CO-07" },
+      { id: 20, nombre: "ANEL TORRES", puesto: "GERENTE DE BODAS", clave: "CO-08" },
+      { id: 21, nombre: "YURI PERALTA", puesto: "GERENTE DE CALIDAD", clave: "CO-09" },
+      { id: 22, nombre: "POR ASIGNAR", puesto: "GERENTE E-COMMERCE", clave: "CO-10" },
+      { id: 23, nombre: "IVAN PULIDO", puesto: "GERENTE NOCTURNO", clave: "CO-11" },
+      { id: 24, nombre: "ADRIANA GUZMAN", puesto: "GERENTE DE DISTRIBUCION", clave: "CO-12" },
+      { id: 25, nombre: "ORFANEL PELAEZ", puesto: "GTE. DE GRPOS Y CONVENCIONES", clave: "CO-13" },
+      { id: 26, nombre: "JOSE ALONSO SOTO", puesto: "GERENTE DE CAPACITACION", clave: "CO-14" },
+      { id: 27, nombre: "JESSICA MARQUEZ", puesto: "GERENTE DE COMPRAS", clave: "CO-15" },
+      { id: 28, nombre: "ROSALINA MENDEZ", puesto: "GERENTE CREDITO Y COBRANZA", clave: "CO-16" },
+      { id: 29, nombre: "JOSE JEREMIAS CHE", puesto: "GERENTE DE SISTEMAS", clave: "CO-17" },
+      { id: 30, nombre: "CRISTIAN MIRANDA", puesto: "GERENTE DE SEGURIDAD", clave: "CO-18" },
+      { id: 31, nombre: "ARMANDO ARROYO", puesto: "SUBDIRECTOR DE VENTAS", clave: "CO-19" },
+      { id: 32, nombre: "CAROLINA LEON", puesto: "SUBCONTRALORA", clave: "CO-20" },
+      { id: 33, nombre: "ISELA ARELLANO", puesto: "SUB GERENTE RRHH", clave: "CO-21" },
+      { id: 34, nombre: "CHRISTIAN ANDRADE", puesto: "SUBGERENTE DE MANTTO.", clave: "CO-22" },
+      { id: 35, nombre: "CARMEN MARTINEZ", puesto: "SUBGERENTE DE BODAS", clave: "CO-23" },
+      { id: 36, nombre: "JORGE ALBERTO KUCH", puesto: "CHEF EJECUTIVO", clave: "CO-24" },
+      { id: 37, nombre: "CLAUDIA HERNANDEZ", puesto: "SOUS CHEF EJECUTIVO", clave: "CO-25" },
+      { id: 38, nombre: "ADRIANA MORALES", puesto: "CONTRALOR DE COSTOS", clave: "CO-26" },
+      { id: 39, nombre: "POR ASIGNAR", puesto: "CHIEF CONCIERGE", clave: "CO-27" },
+      { id: 40, nombre: "LESLIE GONZALEZ", puesto: "CHIEF STEWARD", clave: "CO-28" },
+      { id: 41, nombre: "JOSE ANGEL HERNANDEZ", puesto: "AMO DE LLAVES", clave: "CO-29" },
+      { id: 42, nombre: "BRAYAN ALDANA", puesto: "JEFE DE BARES", clave: "CO-30" },
+      { id: 43, nombre: "MARIO ENRIQUE SEGOVIA", puesto: "JEFE DE TELEFONOS", clave: "CO-31" },
+      { id: 44, nombre: "POR ASIGNAR", puesto: "ASISTENTE DE A Y B", clave: "CO-32" },
+      { id: 45, nombre: "SAMANTHA CHUC", puesto: "ASISTENTE DE ENTRETENIMIENTO", clave: "CO-33" },
+      { id: 46, nombre: "ALEXIS GONZÁLEZ", puesto: "COORDINADOR DE MARKETING", clave: "CO-34" }
+    ];
+
     let miembrosComite = JSON.parse(localStorage.getItem('comite_miembros')) || [];
+    if (miembrosComite.length === 0) {
+      miembrosComite = miembrosComiteOficial;
+      localStorage.setItem('comite_miembros', JSON.stringify(miembrosComite));
+    }
+
     let miembrosColegas = JSON.parse(localStorage.getItem('colega_miembros')) || [];
 
     let tempComite = null;
     let tempColega = null;
-
     let qrComite = null;
     let qrColega = null;
 
     document.addEventListener('DOMContentLoaded', () => {
+      checkThemePreference();
       qrComite = new QRious({ element: document.getElementById('c_qrCanvas'), size: 200, level: 'H' });
       qrColega = new QRious({ element: document.getElementById('v_qrCanvas'), size: 200, level: 'H' });
+
+      // Generar automáticamente las imágenes QR para los miembros que no la tengan en localStorage
+      generarQRsFaltantes();
 
       renderizarTablaComite();
       renderizarTablaColega();
     });
+
+    function checkThemePreference() {
+      const savedTheme = localStorage.getItem('sapphire_theme');
+      const themeBtn = document.getElementById('themeToggleBtn');
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (themeBtn) themeBtn.innerText = '☀️';
+      } else {
+        if (themeBtn) themeBtn.innerText = '🌙';
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('sapphire_theme', isDark ? 'dark' : 'light');
+      const themeBtn = document.getElementById('themeToggleBtn');
+      if (themeBtn) {
+        themeBtn.innerText = isDark ? '☀️' : '🌙';
+      }
+    }
 
     // Control de Pestañas
     function cambiarPestana(pestana) {
@@ -523,15 +717,34 @@
       }
     }
 
+    // Generar imágenes QR automáticas en Base64 para elementos que no la tengan
+    function generarQRsFaltantes() {
+      let actualizado = false;
+      const canvasTemp = document.createElement('canvas');
+      const qrTemp = new QRious({ element: canvasTemp, size: 200, level: 'H' });
+
+      miembrosComite.forEach(m => {
+        if (!m.qrImagen) {
+          qrTemp.value = `Nombre: ${m.nombre}\nPuesto: ${m.puesto}\nClave: ${m.clave}`;
+          m.qrImagen = canvasTemp.toDataURL("image/png");
+          actualizado = true;
+        }
+      });
+
+      if (actualizado) {
+        localStorage.setItem('comite_miembros', JSON.stringify(miembrosComite));
+      }
+    }
+
     // --- LÓGICA COMITÉ ---
     function generarQRComite(e) {
       e.preventDefault();
       const nombre = document.getElementById('c_nombre').value.trim();
       const puesto = document.getElementById('c_puesto').value.trim();
-      const numero = document.getElementById('c_numero').value.trim();
+      const clave = document.getElementById('c_clave').value.trim();
 
-      qrComite.value = `Tipo: Comité\nNombre: ${nombre}\nPuesto: ${puesto}\nNúmero: ${numero}`;
-      tempComite = { nombre, puesto, numero };
+      qrComite.value = `Nombre: ${nombre}\nPuesto: ${puesto}\nClave: ${clave}`;
+      tempComite = { nombre, puesto, clave };
 
       document.getElementById('c_placeholder').classList.add('hidden');
       document.getElementById('c_qrCanvas').classList.remove('hidden');
@@ -555,14 +768,35 @@
 
     function renderizarTablaComite() {
       const tbody = document.getElementById('tablaComite');
+      const textoBusqueda = document.getElementById('c_searchFilter') ? document.getElementById('c_searchFilter').value.trim().toLowerCase() : '';
       tbody.innerHTML = '';
 
       if (miembrosComite.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 25px;">Sin registros.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-light); padding: 25px;">Sin registros.</td></tr>`;
         return;
       }
 
-      miembrosComite.forEach((m, index) => {
+      let filtrados = miembrosComite.filter(m => {
+        const nombreMatch = m.nombre && m.nombre.toLowerCase().includes(textoBusqueda);
+        const puestoMatch = m.puesto && m.puesto.toLowerCase().includes(textoBusqueda);
+        const claveMatch = m.clave && m.clave.toLowerCase().includes(textoBusqueda);
+        return nombreMatch || puestoMatch || claveMatch;
+      });
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-light); padding: 25px;">No se encontraron resultados.</td></tr>`;
+        return;
+      }
+
+      filtrados.forEach((m, index) => {
+        // Asegurar que tenga QR generado
+        if (!m.qrImagen) {
+          const canvasTemp = document.createElement('canvas');
+          const qrTemp = new QRious({ element: canvasTemp, size: 200, level: 'H' });
+          qrTemp.value = `Nombre: ${m.nombre}\nPuesto: ${m.puesto}\nClave: ${m.clave}`;
+          m.qrImagen = canvasTemp.toDataURL("image/png");
+        }
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="num-orden">${index + 1}</td>
@@ -573,14 +807,14 @@
             </div>
           </td>
           <td>
-            <img src="${m.qrImagen}" class="qr-thumb" onclick="abrirModal('${m.nombre}', '${m.puesto} | N°: ${m.numero}', '${m.qrImagen}')">
+            <img src="${m.qrImagen}" class="qr-thumb" onclick="abrirModal('${m.nombre}', '${m.puesto} | Clave: ${m.clave}', '${m.qrImagen}')">
           </td>
           <td><strong>${m.nombre}</strong></td>
           <td>${m.puesto}</td>
-          <td>${m.numero}</td>
+          <td><code>${m.clave}</code></td>
           <td class="actions">
-            <a href="${m.qrImagen}" download="QR_${m.nombre}.png" class="btn btn-sm btn-success">Descargar</a>
-            <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('comite', ${m.id})">Borrar</button>
+            <a href="${m.qrImagen}" download="QR_${m.nombre}.png" class="btn btn-sm btn-success">📥 Descargar</a>
+            <button type="button" class="btn btn-sm btn-danger" onclick="eliminarRegistro('comite', ${m.id})">Borrar</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -596,7 +830,7 @@
       const color = document.getElementById('v_color').value.trim();
       const placas = document.getElementById('v_placas').value.trim();
 
-      qrColega.value = `Tipo: Colega\nN° Colega: ${numColega}\nNombre: ${nombre}\nModelo: ${modelo}\nColor: ${color}\nPlacas: ${placas}`;
+      qrColega.value = `N° Colega: ${numColega}\nNombre: ${nombre}\nModelo: ${modelo}\nColor: ${color}\nPlacas: ${placas}`;
       tempColega = { numColega, nombre, modelo, color, placas };
 
       document.getElementById('v_placeholder').classList.add('hidden');
@@ -621,14 +855,34 @@
 
     function renderizarTablaColega() {
       const tbody = document.getElementById('tablaColega');
+      const textoBusqueda = document.getElementById('v_searchFilter') ? document.getElementById('v_searchFilter').value.trim().toLowerCase() : '';
       tbody.innerHTML = '';
 
       if (miembrosColegas.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color: var(--text-muted); padding: 25px;">Sin registros.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color: var(--text-light); padding: 25px;">Sin registros.</td></tr>`;
         return;
       }
 
-      miembrosColegas.forEach((m, index) => {
+      let filtrados = miembrosColegas.filter(m => {
+        const nombreMatch = m.nombre && m.nombre.toLowerCase().includes(textoBusqueda);
+        const colegaMatch = m.numColega && m.numColega.toLowerCase().includes(textoBusqueda);
+        const placasMatch = m.placas && m.placas.toLowerCase().includes(textoBusqueda);
+        return nombreMatch || colegaMatch || placasMatch;
+      });
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color: var(--text-light); padding: 25px;">No se encontraron resultados.</td></tr>`;
+        return;
+      }
+
+      filtrados.forEach((m, index) => {
+        if (!m.qrImagen) {
+          const canvasTemp = document.createElement('canvas');
+          const qrTemp = new QRious({ element: canvasTemp, size: 200, level: 'H' });
+          qrTemp.value = `N° Colega: ${m.numColega}\nNombre: ${m.nombre}\nModelo: ${m.modelo}\nColor: ${m.color}\nPlacas: ${m.placas}`;
+          m.qrImagen = canvasTemp.toDataURL("image/png");
+        }
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="num-orden">${index + 1}</td>
@@ -647,8 +901,8 @@
           <td>${m.color}</td>
           <td><strong>${m.placas}</strong></td>
           <td class="actions">
-            <a href="${m.qrImagen}" download="QR_Colega_${m.numColega}.png" class="btn btn-sm btn-success">Descargar</a>
-            <button class="btn btn-sm btn-danger" onclick="eliminarRegistro('colega', ${m.id})">Borrar</button>
+            <a href="${m.qrImagen}" download="QR_Colega_${m.numColega}.png" class="btn btn-sm btn-success">📥 Descargar</a>
+            <button type="button" class="btn btn-sm btn-danger" onclick="eliminarRegistro('colega', ${m.id})">Borrar</button>
           </td>
         `;
         tbody.appendChild(tr);

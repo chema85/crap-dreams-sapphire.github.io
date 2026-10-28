@@ -1,385 +1,454 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control de Acceso - Entradas y Salidas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C.R.A.P - Comité y Colegas</title>
+    <!-- Librería ligera para escanear QR usando la cámara sin internet -->
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/html5-qrcode.min.js"></script>
+    <!-- Librería SheetJS para exportar a Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --primary-light: #2563eb;
+            --accent-color: #3b82f6;
+            --bg-color: #f1f5f9; 
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-  <!-- Librería ligera para escanear QR usando la cámara sin internet -->
-  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/html5-qrcode.min.js"></script>
+        /* Estilos de Modo Oscuro Avanzado */
+        body.dark-mode {
+            --bg-color: #050b14;
+            --card-bg: #111827;
+            --text-color: #f9fafb;
+            --text-light: #9ca3af;
+            --border-color: #1f2937;
+            --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+        }
+        body.dark-mode th {
+            background-color: #1f2937;
+            color: #f9fafb;
+            border-bottom-color: #374151;
+        }
+        body.dark-mode td {
+            border-bottom-color: #1f2937;
+        }
+        body.dark-mode tr:hover {
+            background-color: #1f2937 !important;
+        }
+        body.dark-mode select, 
+        body.dark-mode input[type="date"],
+        body.dark-mode input[type="text"] {
+            background: #0b132b;
+            color: #f9fafb;
+            border-color: #1f2937;
+        }
+        body.dark-mode .tabs-container {
+            border-bottom-color: #1f2937;
+        }
 
-  <style>
-    :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --success: #10b981;
-      --success-hover: #059669;
-      --danger: #ef4444;
-      --danger-hover: #dc2626;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-    }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            padding: 30px 20px; 
+            display: flex; 
+            justify-content: center; 
+            min-height: 100vh; 
+            transition: background-color 0.4s ease, color 0.4s ease; 
+        }
+        .container { width: 100%; max-width: 1400px; }
+        
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-lg);
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        @media (min-width: 1024px) {
+            header { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+        header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+        header p { color: #93c5fd; font-size: 14px; margin-top: 6px; font-weight: 500; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+        .btn-admin {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(4px);
+        }
+        .btn-admin:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
 
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      padding: 24px 16px;
-    }
+        /* Pestañas */
+        .tabs-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+            background: #e2e8f0;
+            padding: 6px;
+            border-radius: 14px;
+        }
+        body.dark-mode .tabs-container { background: #1f2937; }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-light);
+            cursor: pointer;
+            border-radius: 10px;
+            transition: var(--transition-smooth);
+            text-transform: uppercase;
+        }
+        .tab-btn:hover { color: var(--text-color); }
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--primary-light);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
+        }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-    h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-    }
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            border: 1px solid var(--border-color); 
+            padding: 30px; 
+            box-shadow: var(--shadow-sm); 
+            transition: var(--transition-smooth);
+            margin-bottom: 25px;
+        }
+        .card:hover { box-shadow: var(--shadow-md); }
+        .card h3 { font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--text-color); letter-spacing: -0.3px; }
 
-    .btn-admin {
-      background-color: var(--text);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        @media (min-width: 850px) {
+            .controls-grid { grid-template-columns: 1fr 380px; }
+        }
 
-    .btn-admin:hover {
-      background-color: #334155;
-    }
+        .scanner-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1.5px dashed var(--border-color);
+        }
+        body.dark-mode .scanner-box { background: #0b132b; }
 
-    /* Pestañas */
-    .tabs-container {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid var(--border);
-    }
+        .scanner-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            width: 100%;
+        }
 
-    .tab-btn {
-      padding: 10px 20px;
-      border: none;
-      background: none;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all 0.2s ease;
-      margin-bottom: -2px;
-    }
+        #c_reader, #v_reader {
+            width: 100%;
+            max-width: 320px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 15px;
+            border: 2px solid var(--border-color);
+        }
 
-    .tab-btn.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
+        label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
 
-    .tab-content {
-      display: none;
-    }
+        select, input[type="date"], input[type="text"] {
+            padding: 12px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 14px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            outline: none;
+            width: 100%;
+            transition: var(--transition-smooth);
+        }
+        select:focus, input[type="date"]:focus, input[type="text"]:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
 
-    .tab-content.active {
-      display: block;
-    }
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            background: #f8fafc;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1.5px solid var(--border-color);
+        }
+        body.dark-mode .filter-bar { background: #0b132b; }
+        .filter-bar input[type="date"] { max-width: 200px; }
+        .filter-bar input[type="text"] { flex-grow: 1; min-width: 200px; }
 
-    .card {
-      background: var(--card-bg);
-      border-radius: 14px;
-      padding: 20px;
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      margin-bottom: 20px;
-    }
+        .btn-clear {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1.5px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            transition: var(--transition-smooth);
+        }
+        .btn-clear:hover { border-color: var(--primary-light); transform: translateY(-1px); }
 
-    /* Controles de marcaje y escáner */
-    .controls-grid {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 20px;
-    }
+        .btn-export-excel {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+        .btn-export-excel:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+        }
 
-    @media (max-width: 850px) {
-      .controls-grid {
-        grid-template-columns: 1fr;
-      }
-    }
+        /* Tablas */
+        .table-container { overflow-x: auto; border: 1.5px solid var(--border-color); border-radius: 14px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        th { background-color: var(--card-bg); color: var(--text-color); font-weight: 700; padding: 16px 18px; border-bottom: 2px solid var(--border-color); }
+        td { padding: 12px 18px; border-bottom: 1px solid var(--border-color); color: var(--text-color); transition: var(--transition-smooth); vertical-align: middle; }
+        tr:hover { background-color: #f8fafc; }
 
-    .scanner-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
+        .badge-entrada {
+            background-color: #dcfce7;
+            color: #15803d;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-block;
+        }
+        .badge-salida {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-block;
+        }
 
-    .scanner-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-      width: 100%;
-    }
+        /* Botones de acción rápida H/E y H/S en cada fila */
+        .btn-action-he, .btn-action-hs {
+            border: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-action-he { background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        .btn-action-he:hover { background-color: #bbf7d0; transform: scale(1.05); }
 
-    #c_reader, #v_reader {
-      width: 100%;
-      max-width: 300px;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
+        .btn-action-hs { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .btn-action-hs:hover { background-color: #fecaca; transform: scale(1.05); }
 
-    .form-inline {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    select, input[type="date"] {
-      padding: 10px 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.95rem;
-      background-color: #f8fafc;
-      outline: none;
-      width: 100%;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn {
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      flex: 1;
-      transition: all 0.2s;
-    }
-
-    .btn-success { background-color: var(--success); color: white; }
-    .btn-success:hover { background-color: var(--success-hover); }
-
-    .btn-danger { background-color: var(--danger); color: white; }
-    .btn-danger:hover { background-color: var(--danger-hover); }
-
-    .btn-secondary { background-color: #64748b; color: white; }
-    .btn-secondary:hover { background-color: #475569; }
-
-    .filter-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-
-    .filter-bar label {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    .filter-bar input[type="date"] {
-      max-width: 200px;
-    }
-
-    .btn-clear {
-      background: #f1f5f9;
-      border: 1px solid var(--border);
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-
-    /* Tablas */
-    .table-container { overflow-x: auto; }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f1f5f9;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      padding: 12px 14px;
-      font-weight: 600;
-    }
-
-    td {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.9rem;
-      vertical-align: middle;
-    }
-
-    .badge-entrada {
-      background: #dcfce7;
-      color: #15803d;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .badge-salida {
-      background: #fee2e2;
-      color: #b91c1c;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-  </style>
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        @keyframes slideDown { 
+            from { opacity: 0; transform: translateY(-25px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+    </style>
 </head>
 <body>
 
   <div class="container">
     <header>
-      <h1>Control de Accesos</h1>
       <div>
-        <button class="btn-admin" onclick="window.location.href='index.html'">Inicio</button>
-        <button class="btn-admin" onclick="accederAdmin()">Panel Administrador</button>
+        <h1>🏛️ Control de Comité y Colegas</h1>
+        <p>Sistema de Accesos y Seguridad Rápida</p>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <button class="btn-admin" onclick="window.location.href='index.html'">🏠 Inicio PWA</button>
+        <button class="btn-admin" onclick="accederAdmin()">⚙️ Panel Admin</button>
+        <button class="btn-admin" onclick="toggleTheme()" title="Cambiar Tema" id="themeToggleBtn">🌙</button>
       </div>
     </header>
 
     <!-- Pestañas -->
     <div class="tabs-container">
-      <button class="tab-btn active" onclick="cambiarPestana('comite')">Comité</button>
+      <button class="tab-btn active" onclick="cambiarPestana('comite')">Comité Ejecutivo / Operativo</button>
       <button class="tab-btn" onclick="cambiarPestana('colega')">Colegas / Vehículos</button>
     </div>
 
     <!-- PESTAÑA COMITÉ -->
     <div id="tab-comite" class="tab-content active">
       <div class="card controls-grid">
-        <!-- Registro por Botón -->
-        <div class="form-inline">
-          <h3>COMITE OPERATIVO Y EJECUTIVO</h3>
-          <label for="c_selectMiembro">Selecciona Miembro:</label>
-          <select id="c_selectMiembro">
-            <option value="">-- Selecciona una persona --</option>
-          </select>
-
-          <div class="btn-group">
-            <button class="btn btn-success" onclick="marcarManual('comite', 'ENTRADA')">Entrada</button>
-            <button class="btn btn-danger" onclick="marcarManual('comite', 'SALIDA')">Salida</button>
-          </div>
-        </div>
-
         <!-- Escáner QR -->
-        <div class="scanner-box">
-          <h3>2. Escanear Código QR</h3>
+        <div class="scanner-box" style="grid-column: 1 / -1; max-width: 400px; margin: 0 auto;">
+          <h3>📷 Escanear Código QR Rápido</h3>
+          <p style="font-size: 12px; color: var(--text-light); margin-top: 2px;">Apunta con la cámara al carnet del miembro</p>
           <div class="scanner-actions">
-            <button class="btn btn-admin" onclick="solicitarYActivarCamara('comite')">Activar Cámara</button>
-            <button class="btn btn-secondary" onclick="detenerEscaner('comite')">Apagar Cámara</button>
+            <button class="btn-admin" style="background: var(--primary-light); color: white; flex:1;" onclick="solicitarYActivarCamara('comite')">Activar Cámara</button>
+            <button class="btn-admin" style="background: #64748b; color: white; flex:1;" onclick="detenerEscaner('comite')">Apagar</button>
           </div>
           <div id="c_reader"></div>
         </div>
       </div>
 
-      <!-- Tabla y Filtro -->
-      <div class="card table-container">
-        <div class="filter-bar">
-          <label for="c_fechaFiltro">Filtrar por Fecha:</label>
-          <input type="date" id="c_fechaFiltro" onchange="renderizarTablaComite()">
-          <button class="btn-clear" onclick="limpiarFiltro('c_fechaFiltro', 'comite')">Mostrar Todo</button>
+      <!-- Tabla y Filtros con Botón de Exportar Excel -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+            <h3>📋 Lista de Comité (Control de Entradas y Salidas)</h3>
+            <button type="button" class="btn-export-excel" onclick="exportarExcel('comite')">📊 Exportar a Excel</button>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Tipo</th>
-              <th>Nombre</th>
-              <th>Puesto</th>
-              <th>Número</th>
-              <th>Fecha</th>
-              <th>Hora</th>
-            </tr>
-          </thead>
-          <tbody id="tablaComite"></tbody>
-        </table>
+        <div class="filter-bar">
+          <label for="c_fechaFiltro">📅 Fecha:</label>
+          <input type="date" id="c_fechaFiltro" onchange="renderizarTablaComite()">
+          
+          <label for="c_searchFilter">🔍 Buscar:</label>
+          <input type="text" id="c_searchFilter" placeholder="Nombre, Puesto o Clave..." oninput="renderizarTablaComite()">
+          
+          <button class="btn-clear" onclick="limpiarFiltro('comite')">🔄 Limpiar Filtros</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>NOMBRE</th>
+                <th>PUESTOS</th>
+                <th>CLAVE</th>
+                <th>H/E <span style="font-size:10px; opacity:0.7;">(1ra)</span></th>
+                <th>H/S <span style="font-size:10px; opacity:0.7;">(1ra)</span></th>
+                <th>H/E <span style="font-size:10px; opacity:0.7;">(2da)</span></th>
+                <th>H/S <span style="font-size:10px; opacity:0.7;">(2da)</span></th>
+                <th style="text-align: center;">Acciones Directas</th>
+              </tr>
+            </thead>
+            <tbody id="tablaComite"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- PESTAÑA COLEGA -->
     <div id="tab-colega" class="tab-content">
       <div class="card controls-grid">
-        <!-- Registro por Botón -->
-        <div class="form-inline">
-          <h3>CONTROL DE COLEGA EN MOTO</h3>
-          <label for="v_selectMiembro">Selecciona Colega:</label>
-          <select id="v_selectMiembro">
-            <option value="">-- Selecciona un colega --</option>
-          </select>
-
-          <div class="btn-group">
-            <button class="btn btn-success" onclick="marcarManual('colega', 'ENTRADA')">Entrada</button>
-            <button class="btn btn-danger" onclick="marcarManual('colega', 'SALIDA')">Salida</button>
-          </div>
-        </div>
-
-        <!-- Escáner QR -->
-        <div class="scanner-box">
-          <h3>2. Escanear Código QR</h3>
+        <div class="scanner-box" style="grid-column: 1 / -1; max-width: 400px; margin: 0 auto;">
+          <h3>📷 Escanear Código QR Vehicular</h3>
+          <p style="font-size: 12px; color: var(--text-light); margin-top: 2px;">Apunta al código QR del vehículo</p>
           <div class="scanner-actions">
-            <button class="btn btn-admin" onclick="solicitarYActivarCamara('colega')">Activar Cámara</button>
-            <button class="btn btn-secondary" onclick="detenerEscaner('colega')">Apagar Cámara</button>
+            <button class="btn-admin" style="background: var(--primary-light); color: white; flex:1;" onclick="solicitarYActivarCamara('colega')">Activar Cámara</button>
+            <button class="btn-admin" style="background: #64748b; color: white; flex:1;" onclick="detenerEscaner('colega')">Apagar</button>
           </div>
           <div id="v_reader"></div>
         </div>
       </div>
 
-      <!-- Tabla y Filtro -->
-      <div class="card table-container">
-        <div class="filter-bar">
-          <label for="v_fechaFiltro">Filtrar por Fecha:</label>
-          <input type="date" id="v_fechaFiltro" onchange="renderizarTablaColega()">
-          <button class="btn-clear" onclick="limpiarFiltro('v_fechaFiltro', 'colega')">Mostrar Todo</button>
+      <!-- Tabla y Filtros Colegas con Botón de Exportar Excel -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+            <h3>📋 Lista de Colegas / Vehículos (Accesos)</h3>
+            <button type="button" class="btn-export-excel" onclick="exportarExcel('colega')">📊 Exportar a Excel</button>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Tipo</th>
-              <th>N° Colega</th>
-              <th>Nombre</th>
-              <th>Modelo</th>
-              <th>Placas</th>
-              <th>Fecha</th>
-              <th>Hora</th>
-            </tr>
-          </thead>
-          <tbody id="tablaColega"></tbody>
-        </table>
+        <div class="filter-bar">
+          <label for="v_fechaFiltro">📅 Filtrar por Fecha:</label>
+          <input type="date" id="v_fechaFiltro" onchange="renderizarTablaColega()">
+          <button class="btn-clear" onclick="limpiarFiltro('colega')">🔄 Mostrar Todo</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>N° Colega</th>
+                <th>Nombre</th>
+                <th>Modelo</th>
+                <th>Placas</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+              </tr>
+            </thead>
+            <tbody id="tablaColega"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -387,9 +456,62 @@
   <script>
     const PIN_ADMIN = "1475963";
 
-    let miembrosComite = JSON.parse(localStorage.getItem('comite_miembros')) || [];
-    let miembrosColegas = JSON.parse(localStorage.getItem('colega_miembros')) || [];
+    const miembrosComiteOficial = [
+      { id: 1, nombre: "SALVADOR GUTIERREZ", puesto: "DIRECTOR GENERAL", clave: "CE-01" },
+      { id: 2, nombre: "MARIA FERNANDA CEBALLOS", puesto: "DIRECTORA DE DIVISION CUARTOS", clave: "CE-02" },
+      { id: 3, nombre: "POR ASIGNAR", puesto: "CLUSTER DIRECTOR OF REVENUE MANAGEMENT", clave: "CE-03" },
+      { id: 4, nombre: "RENE MACIN", puesto: "DIRECTOR DE ALIMENTOS Y BEBIDAS", clave: "CE-04" },
+      { id: 5, nombre: "EMMANUEL JIMENEZ", puesto: "DIRECTOR DE INGENIERIA", clave: "CE-05" },
+      { id: 6, nombre: "POR ASIGNAR", puesto: "DIRECTOR DE FINANZAS CLUSTER", clave: "CE-06" },
+      { id: 7, nombre: "ANAHI QUIROZ", puesto: "DIRECTORA DE ENTRETENIMIENTO", clave: "CE-07" },
+      { id: 8, nombre: "GABRIELA GONZALEZ", puesto: "DIRECTORA CLOSTER DE R.H", clave: "CE-08" },
+      { id: 9, nombre: "POR ASIGNAR", puesto: "DIRECTOR DE VENTAS CLOSTER", clave: "CE-09" },
+      { id: 10, nombre: "MÓNICA GÓMEZ", puesto: "CLUSTER SENIOR GROUPS", clave: "CE-10" },
+      { id: 11, nombre: "GABRIELA AURIOLA / AURIQE?", puesto: "REVENUE MANAGER CLUSTER", clave: "CE-11" },
+      { id: 12, nombre: "LEONOR JARQUIN", puesto: "RESERVATION MANAGER CLUSTER", clave: "CE-12" },
+      { id: 13, nombre: "JAIME MAURICIO AYALA", puesto: "DIRECTOR CLUSTER DE MARKETING", clave: "CO-01" },
+      { id: 14, nombre: "CARLOS MELENDEZ", puesto: "MANAGER ON DUTY", clave: "CO-02" },
+      { id: 15, nombre: "REGINA NAVARRETE", puesto: "MANAGER ON DUTY", clave: "CO-03" },
+      { id: 16, nombre: "DIANA ANAID HERNANDEZ", puesto: "ASISTENTE DE GERENCIA", clave: "CO-04" },
+      { id: 17, nombre: "NANCY MIDORI JIMENEZ", puesto: "GERENTE DE RECEPCION", clave: "CO-05" },
+      { id: 18, nombre: "ARLEN DIAZ", puesto: "GERENTE DE CLUB PREFERRED", clave: "CO-06" },
+      { id: 19, nombre: "XIOMARA GUADALUPE", puesto: "GERENTE SPA", clave: "CO-07" },
+      { id: 20, nombre: "ANEL TORRES", puesto: "GERENTE DE BODAS", clave: "CO-08" },
+      { id: 21, nombre: "YURI PERALTA", puesto: "GERENTE DE CALIDAD", clave: "CO-09" },
+      { id: 22, nombre: "POR ASIGNAR", puesto: "GERENTE E-COMMERCE", clave: "CO-10" },
+      { id: 23, nombre: "IVAN PULIDO", puesto: "GERENTE NOCTURNO", clave: "CO-11" },
+      { id: 24, nombre: "ADRIANA GUZMAN", puesto: "GERENTE DE DISTRIBUCION", clave: "CO-12" },
+      { id: 25, nombre: "ORFANEL PELAEZ", puesto: "GTE. DE GRPOS Y CONVENCIONES", clave: "CO-13" },
+      { id: 26, nombre: "JOSE ALONSO SOTO", puesto: "GERENTE DE CAPACITACION", clave: "CO-14" },
+      { id: 27, nombre: "JESSICA MARQUEZ", puesto: "GERENTE DE COMPRAS", clave: "CO-15" },
+      { id: 28, nombre: "ROSALINA MENDEZ", puesto: "GERENTE CREDITO Y COBRANZA", clave: "CO-16" },
+      { id: 29, nombre: "JOSE JEREMIAS CHE", puesto: "GERENTE DE SISTEMAS", clave: "CO-17" },
+      { id: 30, nombre: "CRISTIAN MIRANDA", puesto: "GERENTE DE SEGURIDAD", clave: "CO-18" },
+      { id: 31, nombre: "ARMANDO ARROYO", puesto: "SUBDIRECTOR DE VENTAS", clave: "CO-19" },
+      { id: 32, nombre: "CAROLINA LEON", puesto: "SUBCONTRALORA", clave: "CO-20" },
+      { id: 33, nombre: "ISELA ARELLANO", puesto: "SUB GERENTE RRHH", clave: "CO-21" },
+      { id: 34, nombre: "CHRISTIAN ANDRADE", puesto: "SUBGERENTE DE MANTTO.", clave: "CO-22" },
+      { id: 35, nombre: "CARMEN MARTINEZ", puesto: "SUBGERENTE DE BODAS", clave: "CO-23" },
+      { id: 36, nombre: "JORGE ALBERTO KUCH", puesto: "CHEF EJECUTIVO", clave: "CO-24" },
+      { id: 37, nombre: "CLAUDIA HERNANDEZ", puesto: "SOUS CHEF EJECUTIVO", clave: "CO-25" },
+      { id: 38, nombre: "ADRIANA MORALES", puesto: "CONTRALOR DE COSTOS", clave: "CO-26" },
+      { id: 39, nombre: "POR ASIGNAR", puesto: "CHIEF CONCIERGE", clave: "CO-27" },
+      { id: 40, nombre: "LESLIE GONZALEZ", puesto: "CHIEF STEWARD", clave: "CO-28" },
+      { id: 41, nombre: "JOSE ANGEL HERNANDEZ", puesto: "AMO DE LLAVES", clave: "CO-29" },
+      { id: 42, nombre: "BRAYAN ALDANA", puesto: "JEFE DE BARES", clave: "CO-30" },
+      { id: 43, nombre: "MARIO ENRIQUE SEGOVIA", puesto: "JEFE DE TELEFONOS", clave: "CO-31" },
+      { id: 44, nombre: "POR ASIGNAR", puesto: "ASISTENTE DE A Y B", clave: "CO-32" },
+      { id: 45, nombre: "SAMANTHA CHUC", puesto: "ASISTENTE DE ENTRETENIMIENTO", clave: "CO-33" },
+      { id: 46, nombre: "ALEXIS GONZÁLEZ", puesto: "COORDINADOR DE MARKETING", clave: "CO-34" }
+    ];
 
+    let miembrosComite = JSON.parse(localStorage.getItem('comite_miembros')) || [];
+    if (miembrosComite.length === 0) {
+      miembrosComite = miembrosComiteOficial;
+      localStorage.setItem('comite_miembros', JSON.stringify(miembrosComite));
+    }
+
+    let miembrosColegas = JSON.parse(localStorage.getItem('colega_miembros')) || [];
     let registrosComite = JSON.parse(localStorage.getItem('comite_registros')) || [];
     let registrosColegas = JSON.parse(localStorage.getItem('colega_registros')) || [];
 
@@ -399,10 +521,38 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => {
-      cargarSelects();
+      checkThemePreference();
+      
+      const today = new Date().toISOString().split('T')[0];
+      const cFecha = document.getElementById('c_fechaFiltro');
+      const vFecha = document.getElementById('v_fechaFiltro');
+      if (cFecha && !cFecha.value) cFecha.value = today;
+      if (vFecha && !vFecha.value) vFecha.value = today;
+
       renderizarTablaComite();
       renderizarTablaColega();
     });
+
+    function checkThemePreference() {
+      const savedTheme = localStorage.getItem('sapphire_theme');
+      const themeBtn = document.getElementById('themeToggleBtn');
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (themeBtn) themeBtn.innerText = '☀️';
+      } else {
+        if (themeBtn) themeBtn.innerText = '🌙';
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('sapphire_theme', isDark ? 'dark' : 'light');
+      const themeBtn = document.getElementById('themeToggleBtn');
+      if (themeBtn) {
+        themeBtn.innerText = isDark ? '☀️' : '🌙';
+      }
+    }
 
     function accederAdmin() {
       const pin = prompt("Ingresa el PIN de administración:");
@@ -429,93 +579,81 @@
       }
     }
 
-    function cargarSelects() {
-      const selectC = document.getElementById('c_selectMiembro');
-      const selectV = document.getElementById('v_selectMiembro');
+    function registrarHoraDirecta(miembroId, tipoAcceso) {
+      const miembro = miembrosComite.find(m => m.id === miembroId);
+      if (!miembro) return;
 
-      selectC.innerHTML = '<option value="">-- Selecciona una persona --</option>';
-      selectV.innerHTML = '<option value="">-- Selecciona un colega --</option>';
-
-      miembrosComite.forEach(m => {
-        selectC.innerHTML += `<option value="${m.id}">${m.nombre} (${m.puesto})</option>`;
-      });
-
-      miembrosColegas.forEach(m => {
-        selectV.innerHTML += `<option value="${m.id}">${m.nombre} - Placas: ${m.placas}</option>`;
-      });
-    }
-
-    // --- MARCAJE MANUAL POR BOTÓN ---
-    function marcarManual(categoria, tipoAcceso) {
-      const selectId = categoria === 'comite' ? 'c_selectMiembro' : 'v_selectMiembro';
-      const id = document.getElementById(selectId).value;
-
-      if (!id) {
-        alert("Por favor selecciona una persona primero.");
-        return;
-      }
-
-      const lista = categoria === 'comite' ? miembrosComite : miembrosColegas;
-      const miembro = lista.find(m => m.id == id);
-
-      if (miembro) {
-        registrarMovimiento(categoria, miembro, tipoAcceso);
-      }
-    }
-
-    // --- REGISTRO DE MOVIMIENTOS Y HORA ---
-    function registrarMovimiento(categoria, datos, tipoAcceso) {
+      const fechaFiltro = document.getElementById('c_fechaFiltro').value || new Date().toISOString().split('T')[0];
       const ahora = new Date();
-      const fecha = ahora.toISOString().split('T')[0];
-      const hora = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const hora = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       const nuevoRegistro = {
-        id: Date.now(),
-        tipoAcceso,
-        fecha,
-        hora,
-        ...datos
+        id: miembro.id,
+        tipoAcceso: tipoAcceso,
+        fecha: fechaFiltro,
+        hora: hora,
+        nombre: miembro.nombre,
+        puesto: miembro.puesto,
+        clave: miembro.clave
       };
 
-      if (categoria === 'comite') {
-        registrosComite.unshift(nuevoRegistro);
-        localStorage.setItem('comite_registros', JSON.stringify(registrosComite));
-        renderizarTablaComite();
-      } else {
-        registrosColegas.unshift(nuevoRegistro);
-        localStorage.setItem('colega_registros', JSON.stringify(registrosColegas));
-        renderizarTablaColega();
-      }
-
-      alert(`✅ ${tipoAcceso} registrada para: ${datos.nombre}`);
+      registrosComite.unshift(nuevoRegistro);
+      localStorage.setItem('comite_registros', JSON.stringify(registrosComite));
+      renderizarTablaComite();
     }
 
-    // --- DIBUJAR TABLAS CON FILTROS DE FECHA ---
     function renderizarTablaComite() {
       const tbody = document.getElementById('tablaComite');
       const fechaFiltro = document.getElementById('c_fechaFiltro').value;
+      const textoBusqueda = document.getElementById('c_searchFilter').value.trim().toLowerCase();
       tbody.innerHTML = '';
 
-      let lista = registrosComite;
-      if (fechaFiltro) {
-        lista = lista.filter(r => r.fecha === fechaFiltro);
-      }
-
-      if (lista.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888;">No hay registros.</td></tr>`;
+      if (miembrosComite.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-light); padding:20px;">No hay miembros registrados.</td></tr>`;
         return;
       }
 
-      lista.forEach(r => {
-        const badgeClass = r.tipoAcceso === 'ENTRADA' ? 'badge-entrada' : 'badge-salida';
+      let miembrosFiltrados = miembrosComite.filter(m => {
+        const nombreMatch = m.nombre && m.nombre.toLowerCase().includes(textoBusqueda);
+        const puestoMatch = m.puesto && m.puesto.toLowerCase().includes(textoBusqueda);
+        const claveMatch = m.clave && m.clave.toLowerCase().includes(textoBusqueda);
+        return nombreMatch || puestoMatch || claveMatch;
+      });
+
+      if (miembrosFiltrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-light); padding:20px;">No se encontraron resultados para "${textoBusqueda}".</td></tr>`;
+        return;
+      }
+
+      let regsHoy = registrosComite.filter(r => r.fecha === fechaFiltro);
+
+      miembrosFiltrados.forEach(m => {
+        let movsMiembro = regsHoy.filter(r => (r.id == m.id || r.nombre === m.nombre));
+
+        let he1 = "-", hs1 = "-", he2 = "-", hs2 = "-";
+        let entradas = movsMiembro.filter(r => r.tipoAcceso === 'ENTRADA');
+        let salidas = movsMiembro.filter(r => r.tipoAcceso === 'SALIDA');
+
+        if (entradas.length > 0) he1 = entradas[0].hora;
+        if (salidas.length > 0) hs1 = salidas[0].hora;
+        if (entradas.length > 1) he2 = entradas[1].hora;
+        if (salidas.length > 1) hs2 = salidas[1].hora;
+
         tbody.innerHTML += `
           <tr>
-            <td><span class="${badgeClass}">${r.tipoAcceso}</span></td>
-            <td><strong>${r.nombre}</strong></td>
-            <td>${r.puesto}</td>
-            <td>${r.numero}</td>
-            <td>${r.fecha}</td>
-            <td>${r.hora}</td>
+            <td><strong>${m.nombre}</strong></td>
+            <td>${m.puesto || '-'}</td>
+            <td><code>${m.clave || '-'}</code></td>
+            <td><span class="${he1 !== '-' ? 'badge-entrada' : ''}">${he1}</span></td>
+            <td><span class="${hs1 !== '-' ? 'badge-salida' : ''}">${hs1}</span></td>
+            <td><span class="${he2 !== '-' ? 'badge-entrada' : ''}">${he2}</span></td>
+            <td><span class="${hs2 !== '-' ? 'badge-salida' : ''}">${hs2}</span></td>
+            <td style="text-align: center;">
+              <div style="display: flex; gap: 6px; justify-content: center;">
+                <button type="button" class="btn-action-he" onclick="registrarHoraDirecta(${m.id}, 'ENTRADA')" title="Registrar Hora de Entrada">📥 H/E</button>
+                <button type="button" class="btn-action-hs" onclick="registrarHoraDirecta(${m.id}, 'SALIDA')" title="Registrar Hora de Salida">📤 H/S</button>
+              </div>
+            </td>
           </tr>
         `;
       });
@@ -532,7 +670,7 @@
       }
 
       if (lista.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#888;">No hay registros.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-light); padding:20px;">No hay registros de colegas.</td></tr>`;
         return;
       }
 
@@ -541,10 +679,10 @@
         tbody.innerHTML += `
           <tr>
             <td><span class="${badgeClass}">${r.tipoAcceso}</span></td>
-            <td><strong>${r.numColega}</strong></td>
+            <td><strong>${r.numColega || '-'}</strong></td>
             <td>${r.nombre}</td>
-            <td>${r.modelo} (${r.color})</td>
-            <td><strong>${r.placas}</strong></td>
+            <td>${r.modelo || '-'}</td>
+            <td><strong>${r.placas || '-'}</strong></td>
             <td>${r.fecha}</td>
             <td>${r.hora}</td>
           </tr>
@@ -552,32 +690,94 @@
       });
     }
 
-    function limpiarFiltro(inputId, categoria) {
-      document.getElementById(inputId).value = '';
-      if (categoria === 'comite') renderizarTablaComite();
-      else renderizarTablaColega();
+    function exportarExcel(tipo) {
+      if (tipo === 'comite') {
+        const fechaFiltro = document.getElementById('c_fechaFiltro').value;
+        let regsHoy = registrosComite.filter(r => r.fecha === fechaFiltro);
+
+        const dataExport = miembrosComite.map((m, index) => {
+          let movsMiembro = regsHoy.filter(r => (r.id == m.id || r.nombre === m.nombre));
+          let he1 = "-", hs1 = "-", he2 = "-", hs2 = "-";
+          let entradas = movsMiembro.filter(r => r.tipoAcceso === 'ENTRADA');
+          let salidas = movsMiembro.filter(r => r.tipoAcceso === 'SALIDA');
+
+          if (entradas.length > 0) he1 = entradas[0].hora;
+          if (salidas.length > 0) hs1 = salidas[0].hora;
+          if (entradas.length > 1) he2 = entradas[1].hora;
+          if (salidas.length > 1) hs2 = salidas[1].hora;
+
+          return {
+            "N°": index + 1,
+            "NOMBRE": m.nombre,
+            "PUESTOS": m.puesto || "-",
+            "CLAVE": m.clave || "-",
+            "H/E (1ra)": he1,
+            "H/S (1ra)": hs1,
+            "H/E (2da)": he2,
+            "H/S (2da)": hs2,
+            "FECHA": fechaFiltro
+          };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(dataExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Comite_" + fechaFiltro);
+        XLSX.writeFile(workbook, `Control_Comite_${fechaFiltro}.xlsx`);
+
+      } else {
+        const fechaFiltro = document.getElementById('v_fechaFiltro').value;
+        let lista = registrosColegas;
+        if (fechaFiltro) {
+          lista = lista.filter(r => r.fecha === fechaFiltro);
+        }
+
+        if (lista.length === 0) {
+          alert("No hay registros de colegas para exportar en esta fecha.");
+          return;
+        }
+
+        const dataExport = lista.map((r, index) => ({
+          "N°": index + 1,
+          "TIPO ACCESO": r.tipoAcceso,
+          "N° COLEGA": r.numColega || "-",
+          "NOMBRE": r.nombre || "-",
+          "MODELO": r.modelo || "-",
+          "PLACAS": r.placas || "-",
+          "FECHA": r.fecha,
+          "HORA": r.hora
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(dataExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Colegas_" + (fechaFiltro || "Todos"));
+        XLSX.writeFile(workbook, `Control_Colegas_${fechaFiltro || 'General'}.xlsx`);
+      }
     }
 
-    // --- SOLICITUD DE PERMISO Y CONTROL DE CÁMARA ---
+    function limpiarFiltro(categoria) {
+      const today = new Date().toISOString().split('T')[0];
+      if (categoria === 'comite') {
+        document.getElementById('c_fechaFiltro').value = today;
+        document.getElementById('c_searchFilter').value = '';
+        renderizarTablaComite();
+      } else {
+        document.getElementById('v_fechaFiltro').value = today;
+        renderizarTablaColega();
+      }
+    }
+
     async function solicitarYActivarCamara(categoria) {
       await detenerEscaner(categoria);
 
-      // Verificar si el navegador soporta getUserMedia
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         try {
-          // Solicitar explícitamente el permiso de cámara al sistema
           const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-          
-          // Liberar inmediatamente la transmisión de prueba para permitir que Html5Qrcode la use
           stream.getTracks().forEach(track => track.stop());
-          
-          // Iniciar el lector QR tras haber obtenido el permiso del usuario
           iniciarEscaner(categoria);
         } catch (err) {
-          alert("Permiso denegado o la cámara no está accesible. Asegúrate de otorgar permisos de cámara a la aplicación.");
+          alert("Permiso denegado o la cámara no está accesible.");
         }
       } else {
-        // Fallback directo si getUserMedia no está expuesto directamente
         iniciarEscaner(categoria);
       }
     }
@@ -590,9 +790,7 @@
       const config = {
         fps: 10,
         qrbox: { width: 220, height: 220 },
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true
-        }
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true }
       };
 
       try {
@@ -617,7 +815,7 @@
             (errorMessage) => {}
           );
         } catch (errFinal) {
-          alert("No se pudo iniciar el escáner. Verifica los permisos de cámara de tu dispositivo.");
+          alert("No se pudo iniciar el escáner de la cámara.");
         }
       }
     }
@@ -631,7 +829,7 @@
           }
           instance.clear();
         } catch (e) {
-          console.error("Error al detener la cámara:", e);
+          console.error("Error al detener cámara:", e);
         } finally {
           qrInstances[categoria] = null;
         }
@@ -643,9 +841,11 @@
       let datosExtraidos = {};
 
       lineas.forEach(linea => {
-        const [clave, valor] = linea.split(':').map(s => s.trim());
-        if (clave && valor) {
-          datosExtraidos[clave.toLowerCase()] = valor;
+        const partes = linea.split(':');
+        if (partes.length >= 2) {
+          const clave = partes[0].trim().toLowerCase();
+          const valor = partes.slice(1).join(':').trim();
+          datosExtraidos[clave] = valor;
         }
       });
 
@@ -653,19 +853,30 @@
 
       if (categoria === 'comite') {
         const nombreEncontrado = datosExtraidos['nombre'] || "Desconocido";
-        registrarMovimiento('comite', {
-          nombre: nombreEncontrado,
-          puesto: datosExtraidos['puesto'] || '-',
-          numero: datosExtraidos['número'] || '-'
-        }, tipoAcceso);
+        const miembroMatch = miembrosComite.find(m => m.nombre.toLowerCase() === nombreEncontrado.toLowerCase() || m.clave === datosExtraidos['clave']);
+        
+        if (miembroMatch) {
+          registrarHoraDirecta(miembroMatch.id, tipoAcceso);
+        } else {
+          alert("Miembro no encontrado en la lista del comité.");
+        }
       } else {
-        registrarMovimiento('colega', {
+        const ahora = new Date();
+        const nuevoRegistro = {
+          id: Date.now(),
+          tipoAcceso,
+          fecha: ahora.toISOString().split('T')[0],
+          hora: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           numColega: datosExtraidos['n° colega'] || 'QR',
           nombre: datosExtraidos['nombre'] || 'Escaneado',
           modelo: datosExtraidos['modelo'] || '-',
           color: datosExtraidos['color'] || '-',
           placas: datosExtraidos['placas'] || '-'
-        }, tipoAcceso);
+        };
+        registrosColegas.unshift(nuevoRegistro);
+        localStorage.setItem('colega_registros', JSON.stringify(registrosColegas));
+        renderizarTablaColega();
+        alert(`✅ ${tipoAcceso} registrada para colega: ${nuevoRegistro.nombre}`);
       }
     }
   </script>
