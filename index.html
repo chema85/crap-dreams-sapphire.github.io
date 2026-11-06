@@ -101,7 +101,7 @@
         header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
         header p { color: #93c5fd; font-size: 14px; margin-top: 6px; font-weight: 500; }
 
-        /* Barra de Pestañas Estilo Google (Debajo de la cabecera azul) */
+        /* Barra de Pestañas Estilo Google */
         .master-tabs-bar {
             display: flex;
             gap: 8px;
@@ -244,6 +244,16 @@
         .tab-btn.active { background: var(--card-bg); color: var(--primary-light); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
         .tab-btn.btn-c1000-filter.active { color: #d97706; }
 
+        /* Leyenda de Colores de Estado de Pax */
+        .pax-legend {
+            display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
+            background: #f8fafc; padding: 10px 15px; border-radius: 12px;
+            border: 1.5px solid var(--border-color); margin-bottom: 18px; font-size: 12px; font-weight: 600;
+        }
+        body.dark-mode .pax-legend { background: #0b132b; border-color: #1f2937; }
+        .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
         .register-tabs {
             display: flex; background: #e2e8f0; padding: 6px; border-radius: 14px;
             margin-bottom: 22px; gap: 4px; overflow-x: auto;
@@ -266,7 +276,14 @@
         tr:hover { background-color: #f8fafc; transform: scale(1.002); }
         tr.selected { background-color: #eff6ff !important; }
         tr.selected td { border-bottom-color: #bfdbfe; color: #1e40af; font-weight: 600; }
+
+        /* Clases de Estado de Pax para Filas de la Tabla */
+        tr.pax-completado { background-color: rgba(16, 185, 129, 0.08) !important; border-left: 5px solid var(--success-color); }
+        body.dark-mode tr.pax-completado { background-color: rgba(16, 185, 129, 0.15) !important; }
         
+        tr.pax-parcial { background-color: rgba(245, 158, 11, 0.08) !important; border-left: 5px solid var(--warning-color); }
+        body.dark-mode tr.pax-parcial { background-color: rgba(245, 158, 11, 0.15) !important; }
+
         .checkbox-cell { width: 45px; text-align: center; }
         .checkbox-cell input { width: 18px; height: 18px; accent-color: var(--primary-light); cursor: pointer; }
         .col-num { width: 55px; text-align: center; color: var(--text-light); font-weight: 800; font-size: 13px; }
@@ -334,7 +351,7 @@
             border-radius: 8px; outline: none; background: var(--card-bg); color: var(--text-color);
         }
 
-        /* Estilos específicos de Comité / Admin integrados */
+        /* Estilos de Comité / Admin */
         .scanner-box { display: flex; flex-direction: column; align-items: center; text-align: center; background: #f8fafc; padding: 20px; border-radius: 16px; border: 1.5px dashed var(--border-color); }
         .scanner-actions { display: flex; gap: 10px; margin-top: 12px; width: 100%; }
         #c_reader, #v_reader { width: 100%; max-width: 320px; border-radius: 12px; overflow: hidden; margin-top: 15px; border: 2px solid var(--border-color); }
@@ -483,7 +500,7 @@
         </div>
     </header>
 
-    <!-- BARRA DE PESTAÑAS MAESTRAS (Debajo de la caja azul, sin cambiar de HTML) -->
+    <!-- BARRA DE PESTAÑAS MAESTRAS -->
     <div class="master-tabs-bar">
         <button class="master-tab-btn active" onclick="cambiarSeccionMaestra('index')">🏠 Control Principal</button>
         <button class="master-tab-btn" onclick="cambiarSeccionMaestra('comite')">🏛️ Comité y Colegas</button>
@@ -531,6 +548,14 @@
                     </div>
                 </div>
 
+                <!-- LEYENDA DE ESTADO DE PAX -->
+                <div class="pax-legend">
+                    <span style="font-weight: 800; color: var(--text-color);">📋 Leyenda de Estado:</span>
+                    <div class="legend-item"><span class="legend-dot" style="background: var(--success-color);"></span> <strong style="color: var(--success-color);">Verde:</strong> Todos los Pax ingresaron</div>
+                    <div class="legend-item"><span class="legend-dot" style="background: var(--warning-color);"></span> <strong style="color: var(--warning-color);">Naranja:</strong> Faltan Pax por llegar (Parcial)</div>
+                    <div class="legend-item"><span class="legend-dot" style="background: var(--border-color);"></span> <span>Sin color: No han llegado / 0 Pax registrados</span></div>
+                </div>
+
                 <div class="table-container">
                     <table>
                         <thead>
@@ -540,7 +565,7 @@
                                 <th>Nombre</th>
                                 <th>Hab.</th>
                                 <th>Estado</th>
-                                <th>Pax</th>
+                                <th>Pax (Ingresados / Total)</th>
                                 <th>Cuenta</th>
                             </tr>
                         </thead>
@@ -865,7 +890,7 @@
         { id: 41, nombre: "JOSE ANGEL HERNANDEZ", puesto: "AMO DE LLAVES", clave: "CO-29" },
         { id: 42, nombre: "BRAYAN ALDANA", puesto: "JEFE DE BARES", clave: "CO-30" },
         { id: 43, nombre: "MARIO ENRIQUE SEGOVIA", puesto: "JEFE DE TELEFONOS", clave: "CO-31" },
-        { id: 44, nombre: "POR ASIGNAR",PSEUDO: true, puesto: "ASISTENTE DE A Y B", clave: "CO-32" },
+        { id: 44, nombre: "POR ASIGNAR", PSEUDO: true, puesto: "ASISTENTE DE A Y B", clave: "CO-32" },
         { id: 45, nombre: "SAMANTHA CHUC", puesto: "ASISTENTE DE ENTRETENIMIENTO", clave: "CO-33" },
         { id: 46, nombre: "ALEXIS GONZÁLEZ", puesto: "COORDINADOR DE MARKETING", clave: "CO-34" }
     ];
@@ -903,7 +928,6 @@
         renderDbHistoryUI();
         buildDynamicForm();
 
-        // Inicializar QRs de Admin
         if (document.getElementById('c_qrCanvas')) {
             qrComiteAdmin = new QRious({ element: document.getElementById('c_qrCanvas'), size: 200, level: 'H' });
             qrColegaAdmin = new QRious({ element: document.getElementById('v_qrCanvas'), size: 200, level: 'H' });
@@ -935,7 +959,7 @@
         }
     };
 
-    /* ================= NAVEGACIÓN MAESTRA (PESTAÑAS GOOGLE) ================= */
+    /* ================= NAVEGACIÓN MAESTRA ================= */
     function cambiarSeccionMaestra(seccion) {
         document.querySelectorAll('.master-tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.master-content-section').forEach(sec => sec.classList.remove('active'));
@@ -952,7 +976,6 @@
             renderizarTablaComite();
             renderizarTablaColega();
         } else if (seccion === 'admin') {
-            // Protección por PIN opcional o acceso directo fluido
             const pin = prompt("Ingresa el PIN de administración (1475963):");
             if (pin !== PIN_ADMIN) {
                 if (pin !== null) alert("PIN incorrecto.");
@@ -1146,6 +1169,7 @@
         return JSON.parse(localStorage.getItem(`sapphire_history_${fieldId}`)) || [];
     }
 
+    /* LECTURA DINÁMICA E INTELIGENTE DE EXCEL */
     document.getElementById('excelFileInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -1164,37 +1188,77 @@
             workbook.SheetNames.forEach(sheetName => {
                 const sheet = workbook.Sheets[sheetName];
                 const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                if (!rows || rows.length === 0) return;
+
                 let tabStatus = "LLEGADA";
                 const nameUpper = sheetName.toUpperCase().trim();
                 if (nameUpper.includes("SALIDA")) tabStatus = "SALIDA";
                 if (nameUpper.includes("HDP EN CASA") || nameUpper.includes("CASA")) tabStatus = "HDP EN CASA";
 
-                rows.forEach(row => {
-                    if (!row || row.length < 2) return;
-                    const firstCell = String(row[0]).toUpperCase().trim();
-                    if (firstCell === "#" || firstCell === "NOMBRE" || firstCell.includes("TOTAL")) return;
+                let colIdx = { num: -1, name: -1, room: -1, ad: -1, men: -1 };
+                let headerRowIndex = -1;
 
-                    let numOriginal = row[0] ? String(row[0]).trim() : "-";
-                    let name = row[1] ? String(row[1]).trim() : "";
-                    let room = row[2] ? String(row[2]).trim() : "Por asignar";
-                    let adults = row[3] ? parseInt(row[3]) : 0;
-                    let kids = row[4] ? parseInt(row[4]) : 0;
-
-                    if (name && name !== "" && name !== "undefined") {
-                        let tieneDeuda = (tabStatus === "SALIDA" && (parseInt(numOriginal) % 4 === 0)); 
-                        guestsData.push({
-                            id: tabStatus + "_" + numOriginal + "_" + name.replace(/\s+/g, ''),
-                            number: numOriginal, name, room: room === "" ? "Por asignar" : room,
-                            status: tabStatus, ad: isNaN(adults) ? 0 : adults, men: isNaN(kids) ? 0 : kids,
-                            c1000: tieneDeuda ? "PENDIENTE" : "OK", registered: false, tourPax: 0
-                        });
+                for (let r = 0; r < Math.min(rows.length, 10); r++) {
+                    const rowStr = rows[r].map(c => String(c).toUpperCase().trim());
+                    
+                    const idxName = rowStr.findIndex(c => c.includes("NOMBRE") || c.includes("HUESPED") || c.includes("GUEST") || c.includes("PASAJERO") || c.includes("PAX NAME"));
+                    const idxRoom = rowStr.findIndex(c => c.includes("HAB") || c.includes("ROOM") || c.includes("CUARTO") || c.includes("SUITE"));
+                    
+                    if (idxName !== -1 || idxRoom !== -1) {
+                        headerRowIndex = r;
+                        colIdx.name = idxName;
+                        colIdx.room = idxRoom;
+                        colIdx.num = rowStr.findIndex(c => c === "#" || c.includes("N°") || c.includes("NO.") || c.includes("ITEM") || c.includes("CONSECUTIVO"));
+                        colIdx.ad = rowStr.findIndex(c => c === "AD" || c.includes("ADULT") || c === "ADT");
+                        colIdx.men = rowStr.findIndex(c => c === "MN" || c.includes("MENOR") || c.includes("CHILD") || c === "CH" || c.includes("NINOS"));
+                        break;
                     }
-                });
+                }
+
+                if (colIdx.name === -1) colIdx.name = 1;
+                if (colIdx.room === -1) colIdx.room = 2;
+                if (colIdx.num === -1) colIdx.num = 0;
+                if (colIdx.ad === -1) colIdx.ad = 3;
+                if (colIdx.men === -1) colIdx.men = 4;
+
+                const startRow = headerRowIndex !== -1 ? headerRowIndex + 1 : 0;
+
+                for (let i = startRow; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length < 2) continue;
+
+                    const firstCell = String(row[0] || "").toUpperCase().trim();
+                    if (firstCell.includes("TOTAL") || firstCell.includes("RESUMEN")) continue;
+
+                    let name = colIdx.name !== -1 && row[colIdx.name] ? String(row[colIdx.name]).trim() : "";
+                    if (!name || name === "undefined" || name.toUpperCase() === "NOMBRE") continue;
+
+                    let numOriginal = (colIdx.num !== -1 && row[colIdx.num] !== undefined) ? String(row[colIdx.num]).trim() : "-";
+                    let room = (colIdx.room !== -1 && row[colIdx.room] !== undefined) ? String(row[colIdx.room]).trim() : "Por asignar";
+                    let adults = (colIdx.ad !== -1 && row[colIdx.ad] !== undefined) ? parseInt(row[colIdx.ad]) : 0;
+                    let kids = (colIdx.men !== -1 && row[colIdx.men] !== undefined) ? parseInt(row[colIdx.men]) : 0;
+
+                    let tieneDeuda = (tabStatus === "SALIDA" && (parseInt(numOriginal) % 4 === 0));
+
+                    guestsData.push({
+                        id: tabStatus + "_" + numOriginal + "_" + name.replace(/\s+/g, ''),
+                        number: numOriginal || "-",
+                        name: name,
+                        room: (!room || room === "") ? "Por asignar" : room,
+                        status: tabStatus,
+                        ad: isNaN(adults) ? 0 : adults,
+                        men: isNaN(kids) ? 0 : kids,
+                        totalPax: (isNaN(adults) ? 0 : adults) + (isNaN(kids) ? 0 : kids),
+                        registeredPax: 0, // Control de Pax ingresados
+                        c1000: tieneDeuda ? "PENDIENTE" : "OK",
+                        tourPax: 0
+                    });
+                }
             });
 
             if (guestsData.length > 0) {
                 statusLabel.style.color = "var(--success-color)";
-                statusLabel.innerText = `✅ ¡Carga Exitosa! ${guestsData.length} registros guardados.`;
+                statusLabel.innerText = `✅ ¡Carga Exitosa! ${guestsData.length} registros cargados correctamente.`;
                 document.getElementById('searchInput').disabled = false;
                 saveToLocalStorage();
                 saveDatabaseToHistory(file.name, guestsData);
@@ -1202,7 +1266,7 @@
                 updateCounters();
             } else {
                 statusLabel.style.color = "red";
-                statusLabel.innerText = "❌ Formato incompatible.";
+                statusLabel.innerText = "❌ Formato incompatible o sin datos válidos.";
             }
         };
         reader.readAsArrayBuffer(file);
@@ -1265,9 +1329,9 @@
 
     function updateCounters() {
         const llegadasTot = guestsData.filter(g => g.status === "LLEGADA").length;
-        const llegadasReg = guestsData.filter(g => g.status === "LLEGADA" && g.registered).length;
+        const llegadasReg = guestsData.filter(g => g.status === "LLEGADA" && g.registeredPax > 0).length;
         const salidasTot = guestsData.filter(g => g.status === "SALIDA").length;
-        const salidasReg = guestsData.filter(g => g.status === "SALIDA" && g.registered).length;
+        const salidasReg = guestsData.filter(g => g.status === "SALIDA" && g.registeredPax > 0).length;
         const casaTot = guestsData.filter(g => g.status === "HDP EN CASA").length;
 
         let uniqueRoomsTour = {};
@@ -1309,8 +1373,20 @@
         filtered.forEach(guest => {
             const isSelected = selectedGuests.some(g => g.id === guest.id);
             const tr = document.createElement("tr");
-            if (isSelected) tr.className = "selected";
-            if (guest.registered) tr.style.opacity = "0.75";
+
+            // Lógica de Colores de Estado de Pax
+            const total = guest.totalPax || (guest.ad + guest.men) || 1;
+            const reg = guest.registeredPax || 0;
+            let rowClass = "";
+
+            if (reg >= total && total > 0) {
+                rowClass = "pax-completado"; // Verde: Todos ingresaron
+            } else if (reg > 0 && reg < total) {
+                rowClass = "pax-parcial"; // Naranja: Faltan pax
+            }
+
+            if (isSelected) rowClass += " selected";
+            tr.className = rowClass.trim();
 
             let badgeClass = "badge-casa", badgeText = guest.status === 'HDP EN CASA' ? 'En Casa' : guest.status;
             if (guest.tourPax > 0) { badgeClass = "badge-tour"; badgeText = `🚌 En Tour (${guest.tourPax} Pax)`; }
@@ -1327,10 +1403,10 @@
             tr.innerHTML = `
                 <td class="checkbox-cell" onclick="event.stopPropagation(); toggleSelect('${guest.id}')"><input type="checkbox" ${isSelected ? 'checked' : ''}></td>
                 <td class="col-num">${guest.number}</td>
-                <td><strong>${guest.name} ${guest.registered ? '🚗' : ''}</strong></td>
+                <td><strong>${guest.name}</strong></td>
                 <td>${guest.room}</td>
                 <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-                <td>${guest.ad}A / ${guest.men}M</td>
+                <td><strong>${reg} / ${total}</strong> Pax <span style="font-size:11px; opacity:0.7;">(${guest.ad}A/${guest.men}M)</span></td>
                 ${c1000Cell}`;
             tr.addEventListener('click', () => toggleSelect(guest.id));
             tbody.appendChild(tr);
@@ -1527,7 +1603,7 @@
 
             const paxInp = document.getElementById("f_pax");
             if (paxInp) {
-                let sum = selectedGuests.reduce((acc, curr) => acc + (curr.ad || 0) + (curr.men || 0), 0);
+                let sum = selectedGuests.reduce((acc, curr) => acc + (curr.totalPax || curr.ad || 0), 0);
                 paxInp.value = sum || 1;
                 formValuesCache["f_pax"] = paxInp.value;
             }
@@ -1569,11 +1645,21 @@
             if (selectedGuests.length > 0) {
                 selectedGuests.forEach(sg => {
                     const m = guestsData.find(g => g.id === sg.id);
-                    if (m) { m.registered = true; if (m.room && m.room.toLowerCase() !== "por asignar") roomsToUpdate.add(m.room.trim().toLowerCase()); }
+                    if (m) {
+                        m.registeredPax = (m.registeredPax || 0) + Math.round(formPax / selectedGuests.length);
+                        if (m.registeredPax > m.totalPax) m.registeredPax = m.totalPax;
+                        if (m.room && m.room.toLowerCase() !== "por asignar") roomsToUpdate.add(m.room.trim().toLowerCase());
+                    }
                 });
             } else {
                 const rVal = document.getElementById("f_room") ? document.getElementById("f_room").value.trim() : "";
-                if (rVal) { roomsToUpdate.add(rVal.toLowerCase()); guestsData.filter(g => g.room.toLowerCase() === rVal.toLowerCase()).forEach(g => { g.registered = true; }); }
+                if (rVal) {
+                    roomsToUpdate.add(rVal.toLowerCase());
+                    guestsData.filter(g => g.room.toLowerCase() === rVal.toLowerCase()).forEach(g => {
+                        g.registeredPax = (g.registeredPax || 0) + formPax;
+                        if (g.registeredPax > g.totalPax) g.registeredPax = g.totalPax;
+                    });
+                }
             }
 
             roomsToUpdate.forEach(roomName => {
@@ -1586,7 +1672,13 @@
                 }
             });
         } else {
-            selectedGuests.forEach(sg => { const m = guestsData.find(g => g.id === sg.id); if (m) m.registered = true; });
+            selectedGuests.forEach(sg => {
+                const m = guestsData.find(g => g.id === sg.id);
+                if (m) {
+                    m.registeredPax = (m.registeredPax || 0) + Math.round(formPax / selectedGuests.length);
+                    if (m.registeredPax > m.totalPax) m.registeredPax = m.totalPax;
+                }
+            });
         }
 
         recentLogs.unshift(logData);
@@ -1784,7 +1876,6 @@
         else { document.getElementById('v_fechaFiltro').value = today; renderizarTablaColega(); }
     }
 
-    /* Funciones de Admin / QRs */
     function generarQRsFaltantesAdmin() {
         let updated = false;
         const canvasTemp = document.createElement('canvas');
@@ -1925,7 +2016,6 @@
 
     function cerrarModal() { document.getElementById('modalQr').classList.remove('active'); }
 
-    /* Lógica de Cámara QR para Comité / Colegas */
     async function solicitarYActivarCamara(cat) {
         await detenerEscaner(cat);
         try {
