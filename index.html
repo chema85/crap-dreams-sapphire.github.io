@@ -1137,7 +1137,6 @@
         return JSON.parse(localStorage.getItem(`sapphire_history_${fieldId}`)) || [];
     }
 
-    // LECTURA DE EXCEL ACTUALIZADA (PROCESA TANTO EL BLOQUE IZQUIERDO COMO EL BLOQUE DERECHO)
     document.getElementById('excelFileInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -1161,7 +1160,7 @@
                 let tabStatus = "LLEGADA";
                 const nameUpper = sheetName.toUpperCase().trim();
                 if (nameUpper.includes("SALIDA") || nameUpper.includes("SALIDAS")) tabStatus = "SALIDA";
-                else if (nameUpper.includes("CASA") || nameUpper.includes("HDP") || nameUpper.includes("HUESPEDES")) tabStatus = "HDP EN CASA";
+                else if (nameUpper.includes("CASA") || nameUpper.includes("HDP") || nameUpper.includes("HUESPEDES")) tabStatus = "HPD EN CASA";
 
                 let headerRowIndex = -1;
                 let colIdxMap = {};
@@ -1203,7 +1202,6 @@
                     const firstCell = String(row[0] || "").toUpperCase().trim();
                     if (firstCell.includes("TOTAL") || firstCell.includes("RESUMEN")) continue;
 
-                    // 1. PROCESAR BLOQUE IZQUIERDO (Tabla 1)
                     let name1 = "";
                     if (colIdx.name !== -1 && row[colIdx.name] !== undefined) {
                         let rawVal = String(row[colIdx.name]).trim();
@@ -1238,7 +1236,6 @@
                         });
                     }
 
-                    // 2. PROCESAR BLOQUE DERECHO (Tabla 2: Columnas 8 y 9 en HPD EN CASA)
                     if (tabStatus === "HDP EN CASA" && row.length >= 10) {
                         let name2 = row[8];
                         let room2 = row[9];
@@ -1448,6 +1445,10 @@
     function buildDynamicForm() {
         const container = document.getElementById("formGridContainer");
         container.innerHTML = "";
+        
+        // Opciones actualizadas con Day Pass y Visita de inspección
+        const serviceOptions = ["Llegada(in)", "Salida (out)", "Salida de tour (ST)", "Retorno(RT)", "Day Pass", "Visita de inspección"];
+
         const schemas = {
             TRANSPORTE: [
                 { id: "f_hora_ent", label: "Hora de Entrada", type: "time", required: true },
@@ -1458,7 +1459,7 @@
                 { id: "f_room", label: "Habitación", type: "text", required: true },
                 { id: "f_pax", label: "Pax (Total de Personas)", type: "number", required: true },
                 { id: "f_hora_sal", label: "Hora de Salida", type: "time" },
-                { id: "f_servicio", label: "Servicio", type: "select", options: ["Llegada(in)", "Salida (out)", "Salida de tour (ST)", "Retorno(RT)"], required: true }
+                { id: "f_servicio", label: "Servicio", type: "select", options: serviceOptions, required: true }
             ],
             TAXI: [
                 { id: "f_hora_ent", label: "Hora de Entrada", type: "time", required: true },
@@ -1468,7 +1469,7 @@
                 { id: "f_room", label: "Habitación", type: "text", required: true },
                 { id: "f_pax", label: "Pax (Total de Personas)", type: "number", required: true },
                 { id: "f_hora_sal", label: "Hora de Salida", type: "time" },
-                { id: "f_servicio", label: "Servicio", type: "select", options: ["Llegada(in)", "Salida (out)", "Salida de tour (ST)", "Retorno(RT)"], required: true }
+                { id: "f_servicio", label: "Servicio", type: "select", options: serviceOptions, required: true }
             ],
             ESTACIONAMIENTO: [
                 { id: "f_hora_ent", label: "Hora de Entrada", type: "time", required: true },
@@ -1479,7 +1480,7 @@
                 { id: "f_room", label: "Habitación", type: "text", required: true },
                 { id: "f_pax", label: "Pax (Total de Personas)", type: "number", required: true },
                 { id: "f_hora_sal", label: "Hora de Salida", type: "time" },
-                { id: "f_servicio", label: "Servicio", type: "select", options: ["Llegada(in)", "Salida (out)", "Salida de tour (ST)", "Retorno(RT)"], required: true }
+                { id: "f_servicio", label: "Servicio", type: "select", options: serviceOptions, required: true }
             ],
             UBER: [
                 { id: "f_hora_ent", label: "Hora de Entrada", type: "time", required: true },
@@ -1488,7 +1489,7 @@
                 { id: "f_room", label: "Habitación", type: "text", required: true },
                 { id: "f_pax", label: "Pax (Total de Personas)", type: "number", required: true },
                 { id: "f_hora_sal", label: "Hora de Salida", type: "time" },
-                { id: "f_servicio", label: "Servicio", type: "select", options: ["Llegada(in)", "Salida (out)", "Salida de tour (ST)", "Retorno(RT)"], required: true }
+                { id: "f_servicio", label: "Servicio", type: "select", options: serviceOptions, required: true }
             ],
             CAMINADO: [
                 { id: "f_hora_ent", label: "Hora de entrada", type: "time", required: true },
@@ -1496,7 +1497,7 @@
                 { id: "f_room", label: "Habitación", type: "text", required: true },
                 { id: "f_pax", label: "Pax (Total de Personas)", type: "number", required: true },
                 { id: "f_hora_sal", label: "Hora de salida", type: "time" },
-                { id: "f_servicio", label: "Servicio", type: "select", options: ["Llegada(in)", "Salida (out)", "Salida de tour (ST)", "Retorno(RT)"], required: true }
+                { id: "f_servicio", label: "Servicio", type: "select", options: serviceOptions, required: true }
             ]
         };
 
@@ -1542,15 +1543,37 @@
         if (sInp) sInp.addEventListener('input', (e) => { formValuesCache["f_sitio"] = e.target.value; });
 
         const serv = document.getElementById("f_servicio");
+        const roomInp = document.getElementById("f_room");
+
         if (serv) {
             if (formValuesCache["f_servicio"] !== undefined) {
                 serv.value = formValuesCache["f_servicio"];
                 if (serv.value.includes("Salida de tour") || serv.value.includes("Retorno")) sitioGroup.style.display = "flex";
             }
+            
             serv.addEventListener("change", function() {
                 formValuesCache["f_servicio"] = this.value;
-                if (this.value.includes("Salida de tour") || this.value.includes("Retorno")) sitioGroup.style.display = "flex";
-                else { sitioGroup.style.display = "none"; document.getElementById("f_sitio").value = ""; formValuesCache["f_sitio"] = ""; }
+                
+                // Lógica de autocompletado automático para Day Pass y Visita de inspección
+                if (this.value === "Day Pass") {
+                    if (roomInp) {
+                        roomInp.value = "Day Pass";
+                        formValuesCache["f_room"] = "Day Pass";
+                    }
+                } else if (this.value === "Visita de inspección") {
+                    if (roomInp) {
+                        roomInp.value = "Visita de inspección";
+                        formValuesCache["f_room"] = "Visita de inspección";
+                    }
+                }
+
+                if (this.value.includes("Salida de tour") || this.value.includes("Retorno")) {
+                    sitioGroup.style.display = "flex";
+                } else { 
+                    sitioGroup.style.display = "none"; 
+                    document.getElementById("f_sitio").value = ""; 
+                    formValuesCache["f_sitio"] = ""; 
+                }
                 updateSelectedGuestUI();
             });
         }
@@ -1589,16 +1612,24 @@
 
             const roomInp = document.getElementById("f_room");
             const servVal = document.getElementById("f_servicio") ? document.getElementById("f_servicio").value : "";
-            const isLlegadaIn = servVal.includes("Llegada(in)");
-
-            if (roomInp) {
-                let rVals = selectedGuests.map(g => {
-                    let r = g.room || "Por asignar", num = (g.number && g.number !== "-") ? `#${g.number}` : "";
-                    if (isLlegadaIn) return (r.toLowerCase() === "por asignar" || !r) ? (num || r) : (num ? `${r} (${num})` : r);
-                    return r;
-                });
-                roomInp.value = [...new Set(rVals)].filter(Boolean).join(", ");
-                formValuesCache["f_room"] = roomInp.value;
+            
+            // Si el servicio actual es Day Pass o Visita de inspección, respetamos ese valor en habitación
+            if (servVal === "Day Pass" || servVal === "Visita de inspección") {
+                if (roomInp) {
+                    roomInp.value = servVal;
+                    formValuesCache["f_room"] = servVal;
+                }
+            } else {
+                const isLlegadaIn = servVal.includes("Llegada(in)");
+                if (roomInp) {
+                    let rVals = selectedGuests.map(g => {
+                        let r = g.room || "Por asignar", num = (g.number && g.number !== "-") ? `#${g.number}` : "";
+                        if (isLlegadaIn) return (r.toLowerCase() === "por asignar" || !r) ? (num || r) : (num ? `${r} (${num})` : r);
+                        return r;
+                    });
+                    roomInp.value = [...new Set(rVals)].filter(Boolean).join(", ");
+                    formValuesCache["f_room"] = roomInp.value;
+                }
             }
 
             const nameInp = document.getElementById("f_conductor");
@@ -1646,7 +1677,7 @@
 
         const formPax = parseInt(logData.fields["Pax (Total de Personas)"] || logData.fields["Pax"] || 1);
 
-        if (servVal) {
+        if (servVal && servVal !== "Day Pass" && servVal !== "Visita de inspección") {
             let roomsToUpdate = new Set();
             if (selectedGuests.length > 0) {
                 selectedGuests.forEach(sg => {
